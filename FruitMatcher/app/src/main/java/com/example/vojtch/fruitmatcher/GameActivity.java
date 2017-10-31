@@ -1,17 +1,17 @@
 package com.example.vojtch.fruitmatcher;
 
 import android.app.Activity;
-import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
 
-import com.example.vojtch.fruitmatcher.OpenGL.GLSurf;
+
+import java.util.ArrayList;
 
 public class GameActivity extends Activity {
 
-    private GLSurfaceView glSurfaceView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,7 +24,6 @@ public class GameActivity extends Activity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
 
-        glSurfaceView = new GLSurf(this);
 
         setContentView(R.layout.activity_game);
 
@@ -34,18 +33,18 @@ public class GameActivity extends Activity {
                 RelativeLayout.LayoutParams.MATCH_PARENT,
                 RelativeLayout.LayoutParams.MATCH_PARENT
         );
-        relativeLayout.addView(glSurfaceView, glParams);
+
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        glSurfaceView.onPause();
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        glSurfaceView.onResume();
+
     }
 }
