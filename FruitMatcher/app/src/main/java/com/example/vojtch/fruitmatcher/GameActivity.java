@@ -7,6 +7,8 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
 
+import com.example.vojtch.fruitmatcher.OpenGL.GLSurf;
+
 public class GameActivity extends Activity {
 
     private GLSurfaceView glSurfaceView;

@@ -1,7 +1,8 @@
-package com.example.vojtch.fruitmatcher;
+package com.example.vojtch.fruitmatcher.OpenGL;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
+import android.view.MotionEvent;
 
 /**
  * Created by Vojtěch on 25.10.2017.
@@ -20,6 +21,12 @@ public class GLSurf extends GLSurfaceView {
 
         setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
 
+    }
+
+    @Override
+    public  boolean onTouchEvent(MotionEvent event){
+        renderer.processTouchEvent(event);
+        return true;
     }
 
     @Override
