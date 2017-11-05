@@ -1,11 +1,14 @@
 package com.example.vojtch.fruitmatcher;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
 
+
+import com.example.vojtch.fruitmatcher.RenderEngine.CanvasActivity;
 
 import java.util.ArrayList;
 
@@ -33,6 +36,12 @@ public class GameActivity extends Activity {
                 RelativeLayout.LayoutParams.MATCH_PARENT,
                 RelativeLayout.LayoutParams.MATCH_PARENT
         );
+
+
+        Intent i = new Intent(this, CanvasActivity.class);
+        startActivity(i);
+
+
 
     }
 
