@@ -61,14 +61,16 @@ public class Renderer {
             this.lastDrawnBg = gameManager.getBgId();
         }
 
-        this.gameGridCanvas.drawRGB(100, 100, 0);
+        this.gameGridCanvas.drawRGB(20, 20, 20);
 
 
         //Game grid
         for (Tile tile : gameManager.getGameTiles()){
-            Drawable gameTile = getDrawable(tile.getDrawableId());
-            gameTile.setBounds(tile.getTileRect());
-            gameTile.draw(this.gameGridCanvas);
+            if (tile.isVisible()){
+                Drawable gameTile = getDrawable(tile.getDrawableId());
+                gameTile.setBounds(tile.getTileRect());
+                gameTile.draw(this.gameGridCanvas);
+            }
         }
 
         for (Tile tile : gameManager.getEffectTiles()){

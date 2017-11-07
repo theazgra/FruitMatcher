@@ -2,36 +2,42 @@ package com.example.vojtch.fruitmatcher.RenderEngine;
 
 import android.content.Context;
 import android.graphics.Point;
+import android.media.ExifInterface;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.widget.Toast;
 
 import com.example.vojtch.fruitmatcher.R;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.FormatFlagsConversionMismatchException;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.Stack;
+import java.util.StringTokenizer;
 
 
 public class GameManager {
     private HashMap<Point, Tile> gameTiles;
     private HashMap<Point, Tile> effectTiles;
+    private Stack<Tile> selectedTiles;
+
     private int level;
 
     private int bgId;
     private HashMap<String, Integer> quest;
     private Date timeLimit;
 
+    private Context context;
+
     private boolean handleTouch = true;
     private int selectingId = -1;
+    private int possibleComboSize = 0;
+
     private Direction lastMotionDirection = Direction.None;
     private Point startingPosition;
-
-    private Context context;
 
     private static int[] GameTileIds = {
             R.drawable.apple,
@@ -44,26 +50,23 @@ public class GameManager {
 
     private int effectTile = R.drawable.selected;
 
-    private static final int bgImage = R.drawable.bg;
 
-    private static int GameTileCount = GameTileIds.length;
+    public GameManager(int level, Context context){
+        this.gameTiles = new HashMap<Point, Tile>();
+        this.effectTiles = new HashMap<Point, Tile>();
+        this.selectedTiles = new Stack<Tile>();
+        this.level = level;
+        this.context = context;
 
+        loadLevel(this.level);
+    }
 
     private void deselectAllTiles(){
         for (Tile tile : this.gameTiles.values()){
             tile.setSelected(false);
         }
         this.effectTiles.clear();
-    }
-
-
-    public GameManager(int level, Context context){
-        gameTiles = new HashMap<Point, Tile>();
-        effectTiles = new HashMap<Point, Tile>();
-        this.level = level;
-        this.context = context;
-
-        loadLevel(this.level);
+        this.selectedTiles.clear();
     }
 
     public void onTouch(MotionEvent e){
@@ -80,13 +83,106 @@ public class GameManager {
                 break;
             case MotionEvent.ACTION_UP:
                 if (handleTouch){ setSelectedTiles(x, y, false); }
+                checkMatch();
                 deselectAllTiles();
-                break;
 
+                if (!combinationExist())
+                    //throw new Exception("No combination. Implement handler for this.");
+
+
+                break;
+        }
+    }
+
+    private void checkMatch(){
+        if (this.selectedTiles.size() >= 3){
+            int combo = this.selectedTiles.size();
+
+            while (!this.selectedTiles.isEmpty()){
+                getTileAt(this.selectedTiles.pop().getPosition()).setVisible(false);
+            }
+            
+            Toast.makeText(context, "COMBO: " + String.valueOf(combo), Toast.LENGTH_SHORT).show();
+        }
+    }
+    
+    private boolean combinationExist(){
+
+        for (int x = 0; x < Constants.GAME_SQUARE_SIZE; x++) {
+            for (int y = 0; y < Constants.GAME_SQUARE_SIZE; y++) {
+
+                this.possibleComboSize = 0;
+                Point location = new Point(x * Constants.TILE_SIZE, y * Constants.TILE_SIZE);
+                Tile tile = getTileAt(location);
+                if (tile == null)
+                    continue;
+
+                if (checkCombinationFromTile(tile, null)){
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private boolean checkCombinationFromTile(Tile tile, Tile ignoreTile){
+
+        this.possibleComboSize++;
+        if (this.possibleComboSize >= 3)
+            return true;
+
+        Tile upTile = getTileAt(new Point(tile.getPosition().x, tile.getPosition().y - Constants.TILE_SIZE));
+        if (upTile != null && upTile != ignoreTile && upTile.getDrawableId() == tile.getDrawableId()){
+            if (checkCombinationFromTile(upTile, tile))
+                return true;
         }
 
 
+        Tile downTile = getTileAt(new Point(tile.getPosition().x, tile.getPosition().y + Constants.TILE_SIZE));
+        if (downTile != null && downTile != ignoreTile && downTile.getDrawableId() == tile.getDrawableId()){
+            if (checkCombinationFromTile(downTile, tile))
+                return true;
+        }
 
+        Tile leftTile = getTileAt(new Point(tile.getPosition().x - Constants.TILE_SIZE, tile.getPosition().y));
+        if (leftTile != null && leftTile != ignoreTile && leftTile.getDrawableId() == tile.getDrawableId()){
+            if (checkCombinationFromTile(leftTile, tile))
+                return true;
+        }
+
+        Tile rightTile = getTileAt(new Point(tile.getPosition().x + Constants.TILE_SIZE, tile.getPosition().y));
+        if (rightTile != null && rightTile != ignoreTile && rightTile.getDrawableId() == tile.getDrawableId()){
+            if (checkCombinationFromTile(rightTile, tile))
+                return true;
+
+        }
+
+        Tile upLeftTile = getTileAt(new Point(tile.getPosition().x - Constants.TILE_SIZE, tile.getPosition().y - Constants.TILE_SIZE));
+        if (upLeftTile != null && upLeftTile != ignoreTile && upLeftTile.getDrawableId() == tile.getDrawableId()){
+            if (checkCombinationFromTile(upLeftTile, tile))
+                return true;
+        }
+
+        Tile upRightTile = getTileAt(new Point(tile.getPosition().x + Constants.TILE_SIZE, tile.getPosition().y - Constants.TILE_SIZE));
+        if (upRightTile != null && upRightTile != ignoreTile && upRightTile.getDrawableId() == tile.getDrawableId()){
+            if (checkCombinationFromTile(upRightTile, tile))
+                return true;
+        }
+
+        Tile downLeftTile = getTileAt(new Point(tile.getPosition().x - Constants.TILE_SIZE, tile.getPosition().y + Constants.TILE_SIZE));
+        if (downLeftTile != null && downLeftTile != ignoreTile && downLeftTile.getDrawableId() == tile.getDrawableId()){
+            if (checkCombinationFromTile(downLeftTile, tile))
+                return true;
+        }
+
+        Tile downRightTile = getTileAt(new Point(tile.getPosition().x + Constants.TILE_SIZE, tile.getPosition().y + Constants.TILE_SIZE));
+        if (downRightTile != null && downRightTile != ignoreTile && downRightTile.getDrawableId() == tile.getDrawableId()){
+            if (checkCombinationFromTile(downRightTile, tile))
+                return true;
+        }
+
+        return false;
     }
 
     private void setSelectedTiles(int x, int y, boolean firstTouch){
@@ -94,48 +190,67 @@ public class GameManager {
         if (x > Constants.GRID_X_OFFSET && x < Constants.GAME_GRID_WIDTH + Constants.GRID_X_OFFSET &&
             y > Constants.GRID_Y_OFFSET && y < Constants.GAME_GRID_HEIGHT + Constants.GRID_Y_OFFSET){
 
-            x -= Constants.GRID_X_OFFSET;
-            x /= 100;
-            y -= Constants.GRID_Y_OFFSET;
-            y /= 100;
-            //Log.d("Touching at", "x: " + String.valueOf(x) + " ;y: " + String.valueOf(y));
+            x = (x - Constants.GRID_X_OFFSET) / Constants.TILE_SIZE;
+            y = (y - Constants.GRID_Y_OFFSET) / Constants.TILE_SIZE;
 
-            Point effectPosition = new Point(x * Constants.TILE_SIZE, y * Constants.TILE_SIZE);
-            Tile tile = getTileAt(effectPosition);
-
+            Point touchedTilePosition = new Point(x * Constants.TILE_SIZE, y * Constants.TILE_SIZE);
+            Tile tile = getTileAt(touchedTilePosition);
             if (tile != null){
 
                 if (firstTouch){
                     this.selectingId = tile.getDrawableId();
+                    markTile(tile, true);
                 }
+                else {
+                    if (canBeSelected(tile)) {
+                        markTile(tile, true);
+                    }
 
-                startingPosition = new Point(x, y);
-                Direction currentDirection = determineTouchDirection(x, y);
-
-                tile.setSelected(true);
-                addTile(new Tile(effectPosition, this.effectTile, TileType.EffectTile));
-
-
-                if (isInverseDirection(currentDirection)){
-
+                    if (tile == getSecondLastSelectedTile()){
+                        markTile(this.selectedTiles.lastElement(), false);
+                    }
                 }
-
-                if (this.selectingId == tile.getDrawableId()) {
-                    tile.setSelected(true);
-                    addTile(new Tile(effectPosition, this.effectTile, TileType.EffectTile));
-                }
-                this.lastMotionDirection = currentDirection;
-
             }
         }
     }
 
+    private Tile getSecondLastSelectedTile(){
+        if (this.selectedTiles.size() < 2)
+            return null;
+        else
+            return this.selectedTiles.elementAt(this.selectedTiles.size() - 2);
+    }
+
+    private boolean canBeSelected(Tile tile){
+
+        if (this.selectingId != tile.getDrawableId()) {
+            return false;
+        }
+
+
+        Tile lastSelectedTile = this.selectedTiles.peek();
+        int xDistance = Math.abs(lastSelectedTile.getPosition().x - tile.getPosition().x);
+        int yDistance = Math.abs(lastSelectedTile.getPosition().y - tile.getPosition().y);
+
+        if ((xDistance == Constants.TILE_SIZE || xDistance == 0) && (yDistance == Constants.TILE_SIZE || yDistance == 0)){
+            return  true;
+        }
+
+        return  false;
+    }
+
     private void markTile(Tile tile, boolean selected){
         tile.setSelected(selected);
-        if (selected)
+        if (selected){
             addTile(new Tile(tile.getPosition(), this.effectTile, TileType.EffectTile));
-        else
+            if (!this.selectedTiles.contains(tile)){
+                this.selectedTiles.push(tile);
+            }
+        }
+        else {
+            this.selectedTiles.pop();
             this.effectTiles.remove(tile.getPosition());
+        }
     }
 
     private Direction determineTouchDirection(int x, int y){
@@ -223,7 +338,7 @@ public class GameManager {
 
     private int randomGameTileId(){
         Random randomGenerator = new Random();
-        int randomIndex = randomGenerator.nextInt(GameTileCount);
+        int randomIndex = randomGenerator.nextInt(GameTileIds.length);
         return GameTileIds[randomIndex];
     }
 
@@ -235,6 +350,11 @@ public class GameManager {
                 addTile(new Tile(position, randomGameTileId(), TileType.GameTile));
             }
         }
+
+
+        if (!combinationExist()){
+            generateGameTileGrid();
+        }
     }
 
     public void addTile(Tile tile) {
@@ -243,7 +363,8 @@ public class GameManager {
                 gameTiles.put(tile.getPosition(), tile);
                 break;
             case EffectTile:
-                effectTiles.put(tile.getPosition(), tile);
+                if (!this.effectTiles.containsKey(tile.getPosition()))
+                    effectTiles.put(tile.getPosition(), tile);
                 break;
         }
     }
