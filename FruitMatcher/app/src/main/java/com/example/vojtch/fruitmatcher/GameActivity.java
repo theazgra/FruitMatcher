@@ -40,9 +40,6 @@ public class GameActivity extends Activity {
 
         Intent i = new Intent(this, CanvasActivity.class);
         startActivity(i);
-
-
-
     }
 
     @Override
