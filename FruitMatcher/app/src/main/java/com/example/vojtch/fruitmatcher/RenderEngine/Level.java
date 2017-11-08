@@ -7,48 +7,53 @@ public class Level
     private final int levelId;
     //All informations are saved in arrays, index of arrya is equal to given level. First index {0} is default value
 
-    public static int[] bgImage = {
+    private static int[] bgImage = {
             R.drawable.bg,
             R.drawable.bg
     };
 
-    public static int[] appleCount = {
+    private static int[] appleCount = {
             0,
             2
     };
 
-    public static int[] bananaCount = {
+    private static int[] bananaCount = {
             0,
             2
     };
 
-    public static int[] blueberryCount = {
+    private static int[] blueberryCount = {
             0,
             2
     };
 
-    public static int[] lemonCount = {
+    private static int[] lemonCount = {
             0,
             2
     };
 
-    public static int[] orangeCount = {
+    private static int[] orangeCount = {
             0,
             2
     };
 
-    public static int[] strawberryCount = {
+    private static int[] strawberryCount = {
             0,
             2
     };
 
-    public static String[] timeLimit = {
+    private static String[] timeLimit = {
             "00:00:00",
             "00:05:00"
     };
 
+    private static int[] tileCount = {
+            100,
+            150
+    };
+
     public String getLimit(){
-        return this.timeLimit[this.levelId];
+        return timeLimit[this.levelId];
     }
 
 
@@ -56,32 +61,34 @@ public class Level
         this.levelId = level;
     }
 
+    public int getTileCount() { return tileCount[this.levelId]; }
+
     public int getBgResId(){
-        return this.bgImage[this.levelId];
+        return bgImage[this.levelId];
     }
 
     public int getAppleCount(){
-        return this.appleCount[this.levelId];
+        return appleCount[this.levelId];
     }
 
     public int getBananaCount(){
-        return this.bananaCount[this.levelId];
+        return bananaCount[this.levelId];
     }
 
     public int getBlueberryCount(){
-        return this.blueberryCount[this.levelId];
+        return blueberryCount[this.levelId];
     }
 
     public int getLemonCount(){
-        return this.lemonCount[this.levelId];
+        return lemonCount[this.levelId];
     }
 
     public int getOrangeCount(){
-        return this.orangeCount[this.levelId];
+        return orangeCount[this.levelId];
     }
 
     public int getStrawberryCount(){
-        return this.strawberryCount[this.levelId];
+        return strawberryCount[this.levelId];
     }
 
 

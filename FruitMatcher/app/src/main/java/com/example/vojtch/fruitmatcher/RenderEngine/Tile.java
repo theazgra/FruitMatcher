@@ -7,6 +7,9 @@ import android.graphics.Rect;
 public class Tile {
 
     private Point position;
+    private Point destinationPosition;
+    private boolean animate;
+
     private Rect tileRect;
     private int drawableId;
     private TileType tileType;
@@ -26,6 +29,14 @@ public class Tile {
                 this.position.y + Constants.TILE_SIZE);
     }
 
+    public void setPosition(Point location){
+        this.position = location;
+        this.tileRect.left = this.position.x;
+        this.tileRect.right = this.position.x + Constants.TILE_SIZE;
+        this.tileRect.top = this.position.y;
+        this.tileRect.bottom = this.position.y + Constants.TILE_SIZE;
+    }
+
     public void setSelected(boolean value){
         this.selected = value;
     }
@@ -33,7 +44,7 @@ public class Tile {
     /**
     * Scale in percent around center.
     * */
-    public Rect scaleInPercent(float scale){
+    private Rect scaleInPercent(float scale){
 
         int currentWidth =      this.tileRect.right - this.tileRect.left;
         int currentHeight =     this.tileRect.bottom - this.tileRect.top;
@@ -51,12 +62,6 @@ public class Tile {
         scaledRect.bottom    += deltaHeight;
 
         return scaledRect;
-    }
-
-    public void move(Point delta){
-        this.position.x += delta.x;
-        this.position.y += delta.y;
-
     }
 
     public Rect getTileRect(){
@@ -87,5 +92,21 @@ public class Tile {
 
     public void setVisible(boolean visible) {
         this.visible = visible;
+    }
+
+    public Point getDestinationPosition() {
+        return destinationPosition;
+    }
+
+    public void setDestinationPosition(Point destinationPosition) {
+        this.destinationPosition = destinationPosition;
+    }
+
+    public boolean isAnimate() {
+        return animate;
+    }
+
+    public void setAnimate(boolean animate) {
+        this.animate = animate;
     }
 }

@@ -2,8 +2,6 @@ package com.example.vojtch.fruitmatcher.RenderEngine;
 
 import android.content.Context;
 import android.graphics.Point;
-import android.media.ExifInterface;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.Toast;
 
@@ -16,7 +14,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Stack;
-import java.util.StringTokenizer;
 
 
 public class GameManager {
@@ -29,12 +26,15 @@ public class GameManager {
     private int bgId;
     private HashMap<String, Integer> quest;
     private Date timeLimit;
+    private int levelTileCount;
 
     private Context context;
 
     private boolean handleTouch = true;
+    private boolean wasCombo = false;
     private int selectingId = -1;
     private int possibleComboSize = 0;
+
 
     private Direction lastMotionDirection = Direction.None;
     private Point startingPosition;
@@ -58,6 +58,7 @@ public class GameManager {
         this.level = level;
         this.context = context;
 
+
         loadLevel(this.level);
     }
 
@@ -70,36 +71,100 @@ public class GameManager {
     }
 
     public void onTouch(MotionEvent e){
-        //generateGameTileGrid();
         int x = (int) e.getRawX();
         int y = (int) e.getRawY();
 
         switch (e.getAction()){
-            case MotionEvent.ACTION_DOWN:
+            case MotionEvent.ACTION_DOWN:{
+                this.wasCombo = false;
                 if (handleTouch){ setSelectedTiles(x, y, true); }
                 break;
-            case MotionEvent.ACTION_MOVE:
+            }
+            case MotionEvent.ACTION_MOVE:{
                 if (handleTouch){ setSelectedTiles(x, y, false); }
                 break;
-            case MotionEvent.ACTION_UP:
+            }
+            case MotionEvent.ACTION_UP:{
                 if (handleTouch){ setSelectedTiles(x, y, false); }
+
                 checkMatch();
+
                 deselectAllTiles();
 
-                if (!combinationExist())
-                    //throw new Exception("No combination. Implement handler for this.");
+                if (!combinationExist()) {
+                    Toast.makeText(this.context, "No combination", Toast.LENGTH_SHORT).show();
+                    generateGameTileGrid();
+                }
 
-
+                applyGravity();
+                refillGameGrid();
+                applyGravity();
                 break;
+            }
+
         }
+    }
+
+    private void applyGravity(){
+        for (int x = 0; x < Constants.GAME_SQUARE_SIZE; x++) {
+            for (int y = Constants.GAME_SQUARE_SIZE - 1; y >= 0 ; y--) {
+                Point location = new Point(x * Constants.TILE_SIZE, y * Constants.TILE_SIZE);
+                if (getTileAt(location) == null){
+                    applyGravityToColumn(new Point(x, y));
+                    break;
+                }
+            }
+        }
+    }
+
+    private void applyGravityToColumn(Point freeSpace){
+        Stack<Point> freeSpaces = new Stack<Point>();
+        Stack<Tile>  tilesToShift = new Stack<Tile>();
+
+        for (int y = freeSpace.y; y >= 0 ; y--) {
+            Point location = new Point(freeSpace.x * Constants.TILE_SIZE, y * Constants.TILE_SIZE);
+            Tile tile = getTileAt(location);
+
+            if (tile == null){
+                freeSpaces.push(location);
+            }
+            else {
+                freeSpaces.push(tile.getPosition());
+                tilesToShift.push(tile);
+            }
+        }
+
+        while (!tilesToShift.isEmpty()){
+            Tile tile = getTileAt(tilesToShift.firstElement().getPosition());
+            tilesToShift.removeElementAt(0);
+            if (tile == null){
+                continue;
+            }
+
+            //test only
+            relocateTile(tile, freeSpaces.firstElement());
+
+            tile.setAnimate(true);
+            tile.setDestinationPosition(freeSpaces.firstElement());
+            freeSpaces.removeElementAt(0);
+        }
+    }
+
+    private void relocateTile(Tile tile, Point newPosition){
+
+        this.gameTiles.remove(tile.getPosition());
+        this.gameTiles.put(newPosition, tile);
+        tile.setPosition(newPosition);
     }
 
     private void checkMatch(){
         if (this.selectedTiles.size() >= 3){
+            this.wasCombo = true;
             int combo = this.selectedTiles.size();
 
             while (!this.selectedTiles.isEmpty()){
-                getTileAt(this.selectedTiles.pop().getPosition()).setVisible(false);
+                Point p = this.selectedTiles.pop().getPosition();
+                this.gameTiles.remove(p);
             }
             
             Toast.makeText(context, "COMBO: " + String.valueOf(combo), Toast.LENGTH_SHORT).show();
@@ -107,6 +172,10 @@ public class GameManager {
     }
     
     private boolean combinationExist(){
+
+        if (this.gameTiles.size() <= 0){
+            return false;
+        }
 
         for (int x = 0; x < Constants.GAME_SQUARE_SIZE; x++) {
             for (int y = 0; y < Constants.GAME_SQUARE_SIZE; y++) {
@@ -315,7 +384,7 @@ public class GameManager {
         Level lvl = new Level(level);
 
         this.bgId = lvl.getBgResId();
-
+        this.levelTileCount = lvl.getTileCount();
         this.quest = new HashMap<String, Integer>();
         this.quest.put("apple", lvl.getAppleCount());
         this.quest.put("banana", lvl.getBananaCount());
@@ -342,14 +411,51 @@ public class GameManager {
         return GameTileIds[randomIndex];
     }
 
-    public void generateGameTileGrid(){
-        gameTiles.clear();
+    private void refillGameGrid(){
+        if (this.levelTileCount < 1 || !this.wasCombo){
+            return;
+        }
+
+        //int numOfTiles = 0;
         for (int x = 0; x < Constants.GAME_SQUARE_SIZE; x++) {
-            for (int y = 0; y < Constants.GAME_SQUARE_SIZE; y++) {
-                Point position = new Point(x * Constants.TILE_SIZE, y * Constants.TILE_SIZE);
-                addTile(new Tile(position, randomGameTileId(), TileType.GameTile));
+            Point location = new Point(x * Constants.TILE_SIZE, 0);
+            if (getTileAt(location) == null) {
+                Tile newTile = new Tile(location, randomGameTileId(), TileType.GameTile);
+                newTile.setDestinationPosition(location);
+
+                addTile(newTile);
+
+                newTile.setPosition(new Point(location.x, location.y - Constants.TILE_SIZE));
+                --this.levelTileCount;
+            }
+            if (this.levelTileCount < 1){
+                return;
             }
         }
+    }
+
+    private void generateGameTileGrid(){
+        gameTiles.clear();
+        int numOfTiles = 0;
+
+        if (this.levelTileCount <= 0){
+            return;
+        }
+
+        for (int y = Constants.GAME_SQUARE_SIZE - 1; y >= 0 ; y--) {
+            for (int x = 0; x < Constants.GAME_SQUARE_SIZE; x++) {
+
+                Point position = new Point(x * Constants.TILE_SIZE, y * Constants.TILE_SIZE);
+                addTile(new Tile(position, randomGameTileId(), TileType.GameTile));
+                numOfTiles++;
+
+            }
+            if (numOfTiles > this.levelTileCount){
+                break;
+            }
+        }
+
+        this.levelTileCount -= numOfTiles;
 
 
         if (!combinationExist()){
@@ -369,18 +475,7 @@ public class GameManager {
         }
     }
 
-
-    public Collection<Tile> getGameTiles() {
-        return gameTiles.values();
-    }
-
-
-    /**
-     * Get tile at given position.
-     * @param position position of the finger on the touch screen.
-     * @return Tile or null if there is no game tile.
-     */
-    public Tile getTileAt(Point position){
+    private Tile getTileAt(Point position){
         if (this.gameTiles.containsKey(position)){
             return this.gameTiles.get(position);
         }
@@ -391,6 +486,9 @@ public class GameManager {
         return effectTiles.values();
     }
 
+    public Collection<Tile> getGameTiles() {
+        return gameTiles.values();
+    }
 
     public int getBgId() {
         return bgId;
