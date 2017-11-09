@@ -16,8 +16,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".RenderEngine.CanvasActivity">
-        </activity>
+        <activity android:name=".RenderEngine.CanvasActivity"></activity>
+        <activity android:name=".Highscore"></activity>
     </application>
 
 </manifest>
