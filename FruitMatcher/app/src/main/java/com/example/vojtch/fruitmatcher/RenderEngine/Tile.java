@@ -1,8 +1,9 @@
 package com.example.vojtch.fruitmatcher.RenderEngine;
 
-
 import android.graphics.Point;
 import android.graphics.Rect;
+
+import com.example.vojtch.fruitmatcher.R;
 
 public class Tile {
 
@@ -16,17 +17,62 @@ public class Tile {
     private boolean selected = false;
     private boolean visible = true;
 
+    private FruitType fruitType;
 
-    public Tile(Point position, int drawableId, TileType tileType){
+    private int requiredCount ;
+
+    public Tile(Point position, int drawableId, float scale, int requiredCount){
         this.position = position;
         this.drawableId = drawableId;
-        this.tileType = tileType;
+        this.requiredCount = requiredCount;
+
+        setFruitType();
+
 
         this.tileRect = new Rect(
                 this.position.x,
                 this.position.y,
                 this.position.x + Constants.TILE_SIZE,
                 this.position.y + Constants.TILE_SIZE);
+
+        this.tileRect = scaleInPercent(scale);
+    }
+
+    public Tile(Point position, int drawableId, TileType tileType){
+        this.position = position;
+        this.drawableId = drawableId;
+        this.tileType = tileType;
+
+        setFruitType();
+
+        this.tileRect = new Rect(
+                this.position.x,
+                this.position.y,
+                this.position.x + Constants.TILE_SIZE,
+                this.position.y + Constants.TILE_SIZE);
+    }
+
+    private void setFruitType(){
+        switch (this.drawableId){
+            case R.drawable.apple:
+                this.fruitType = FruitType.Apple;
+                break;
+            case R.drawable.banana:
+                this.fruitType = FruitType.Banana;
+                break;
+            case R.drawable.blueberry:
+                this.fruitType = FruitType.Bluberry;
+                break;
+            case R.drawable.lemon:
+                this.fruitType = FruitType.Lemon;
+                break;
+            case R.drawable.orange:
+                this.fruitType = FruitType.Orange;
+                break;
+            case R.drawable.strawberry:
+                this.fruitType = FruitType.Strawberry;
+                break;
+        }
     }
 
     public void setPosition(Point location){
@@ -44,7 +90,7 @@ public class Tile {
     /**
     * Scale in percent around center.
     * */
-    private Rect scaleInPercent(float scale){
+    public Rect scaleInPercent(float scale){
 
         int currentWidth =      this.tileRect.right - this.tileRect.left;
         int currentHeight =     this.tileRect.bottom - this.tileRect.top;
@@ -108,5 +154,17 @@ public class Tile {
 
     public void setAnimate(boolean animate) {
         this.animate = animate;
+    }
+
+    public int getRequiredCount() {
+        return requiredCount;
+    }
+
+    public void setRequiredCount(int requiredCount) {
+        this.requiredCount = requiredCount;
+    }
+
+    public FruitType getFruitType() {
+        return fruitType;
     }
 }

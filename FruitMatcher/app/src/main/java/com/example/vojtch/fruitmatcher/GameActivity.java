@@ -5,11 +5,13 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.DropBoxManager;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 
 import com.example.vojtch.fruitmatcher.Database.DBHandler;
@@ -37,16 +39,12 @@ public class GameActivity extends Activity {
 
         setContentView(R.layout.activity_game);
 
-        //RelativeLayout relativeLayout = (RelativeLayout)findViewById(R.id.relativeLayout);
+        DBHandler db = new DBHandler(this);
+        int lvlCount = db.getLevelCount();
 
-        //RelativeLayout.LayoutParams glParams = new RelativeLayout.LayoutParams(
-        //        RelativeLayout.LayoutParams.MATCH_PARENT,
-        //        RelativeLayout.LayoutParams.MATCH_PARENT
-        //);
-
-
-        //Intent mainGameActivity = new Intent(this, CanvasActivity.class);
-        //startActivity(mainGameActivity);
+        if (lvlCount == 0){
+            db.insertLevels();
+        }
     }
 
     @Override
@@ -62,8 +60,10 @@ public class GameActivity extends Activity {
     }
 
     public void onPlayClick(View v){
-        Intent mainGameActivity = new Intent(this, CanvasActivity.class);
-        startActivity(mainGameActivity);
+        //Intent mainGameActivity = new Intent(this, CanvasActivity.class);
+        //startActivity(mainGameActivity);
+        Intent levelSelect = new Intent(this, LevelSelect.class);
+        startActivity(levelSelect);
     }
 
     public void onHighScoreClick(View v){

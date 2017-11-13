@@ -4,8 +4,19 @@ package com.example.vojtch.fruitmatcher.RenderEngine;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorSpace;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.drawable.Drawable;
+import android.os.CpuUsageInfo;
+import android.provider.CalendarContract;
+
+import com.example.vojtch.fruitmatcher.Database.DatabaseEntity.LevelInfo;
+import com.example.vojtch.fruitmatcher.R;
+
+import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 public class Renderer {
 
@@ -26,10 +37,26 @@ public class Renderer {
     private int bitmapWidth;
     private int bitmapHeight;
 
+    private Paint textPaint;
+    private Paint rectPaint;
+
+    private ArrayList<Tile> questTiles =  null;
+
     public Renderer(int width, int height, Resources resources){
         updateBitmapResolution(width, height);
 
         this.resources = resources;
+
+        this.textPaint = new Paint();
+        this.textPaint.setColor(Color.BLACK);
+        this.textPaint.setTextAlign(Paint.Align.LEFT);
+        this.textPaint.setFakeBoldText(true);
+        this.textPaint.setTextSize(40.0f);
+
+        this.rectPaint = new Paint();
+        this.rectPaint.setColor(Color.BLUE);
+        this.rectPaint.setStrokeWidth(15.0f);
+        this.rectPaint.setStyle(Paint.Style.STROKE);
     }
 
     public void updateBitmapResolution(int width, int height){
@@ -38,7 +65,7 @@ public class Renderer {
 
         this.masterBitmap = Bitmap.createBitmap(this.bitmapWidth, this.bitmapHeight, Bitmap.Config.ARGB_8888);
         this.gameGridBitmap = Bitmap.createBitmap(Constants.GAME_GRID_WIDTH, Constants.GAME_GRID_HEIGHT, Bitmap.Config.ARGB_8888);
-        this.questBitmap = Bitmap.createBitmap(Constants.QUESTION_PANEL_WIDTH, Constants.QUESTION_PANEL_HEIGH, Bitmap.Config.ARGB_8888);
+        this.questBitmap = Bitmap.createBitmap(Constants.QUEST_PANEL_WIDTH, Constants.QUEST_PANEL_HEIGH, Bitmap.Config.ARGB_8888);
         this.coctailBitmap = Bitmap.createBitmap(Constants.COCTAIL_PANEL_WIDTH, Constants.COCTAIL_PANEL_HEIGHT, Bitmap.Config.ARGB_8888);
 
         this.masterCanvas = new Canvas(this.masterBitmap);
@@ -62,6 +89,7 @@ public class Renderer {
         }
 
         this.gameGridCanvas.drawRGB(20, 20, 20);
+        this.questCanvas.drawRGB(255, 136, 20);
 
 
         //Game grid
@@ -80,14 +108,11 @@ public class Renderer {
         }
 
 
-        this.questCanvas.drawRGB(0,0,255);
+        //this.questCanvas.drawRGB(0,0,255);
+        drawQuestPanel(gameManager.getLevelInfo());
+
         this.coctailCanvas.drawRGB(150,0,255);
 
-        Paint p = new Paint();
-        p.setARGB(255, 255, 100, 10);
-        p.setTextSize(60);
-
-        this.questCanvas.drawText("Bananas: 25", 20,100, p);
 
         this.masterCanvas.drawBitmap(
                 this.gameGridBitmap,
@@ -97,8 +122,8 @@ public class Renderer {
 
         this.masterCanvas.drawBitmap(
                 this.questBitmap,
-                0,
-                Constants.QUESTION_PANEL_Y,
+                Constants.Quest_X_OFFSET,
+                Constants.QUEST_Y_OFFSET,
                 null
         );
 
@@ -112,5 +137,62 @@ public class Renderer {
 
 
         return  this.masterBitmap;
+    }
+
+    private void drawQuestPanel(LevelInfo levelInfo){
+        //first call
+        if (this.questTiles == null){
+            this.questTiles = new ArrayList<Tile>();
+
+            int y = (Constants.QUEST_PANEL_HEIGH / 2) - (Constants.TILE_SIZE / 2) ;
+            int x = 50;
+
+            if (levelInfo.getAppleCount() > 0){
+                this.questTiles.add(new Tile(new Point(x, y), R.drawable.apple, 1.2f, levelInfo.getAppleCount()));
+                x += Constants.TILE_SIZE + 50;
+            }
+
+            if (levelInfo.getBananaCount() > 0){
+                this.questTiles.add(new Tile(new Point(x, y), R.drawable.banana, 1.2f, levelInfo.getBananaCount()));
+                x += Constants.TILE_SIZE + 50;
+            }
+
+            if (levelInfo.getBlueberryCount() > 0){
+                this.questTiles.add(new Tile(new Point(x, y), R.drawable.blueberry, 1.2f, levelInfo.getBlueberryCount()));
+                x += Constants.TILE_SIZE + 50;
+            }
+
+            if (levelInfo.getLemonCount() > 0){
+                this.questTiles.add(new Tile(new Point(x, y), R.drawable.lemon, 1.2f, levelInfo.getLemonCount()));
+                x += Constants.TILE_SIZE + 50;
+            }
+
+            if (levelInfo.getOrangeCount() > 0){
+                this.questTiles.add(new Tile(new Point(x, y), R.drawable.orange, 1.2f, levelInfo.getOrangeCount()));
+                x += Constants.TILE_SIZE + 50;
+            }
+
+            if (levelInfo.getStrawberryCount() > 0){
+                this.questTiles.add(new Tile(new Point(x, y), R.drawable.strawberry, 1.2f, levelInfo.getStrawberryCount()));
+            }
+        }
+        else
+        {
+            for (Tile tile : this.questTiles){
+                FruitType fruit = tile.getFruitType();
+                tile.setRequiredCount(levelInfo.getFruitCount(fruit));
+            }
+        }
+
+        this.questCanvas.drawRect(0, 0, this.questCanvas.getWidth(), this.questCanvas.getHeight(), rectPaint);
+
+        for (Tile tile : this.questTiles){
+            Drawable drawable = getDrawable(tile.getDrawableId());
+            drawable.setBounds(tile.getTileRect());
+            drawable.draw(this.questCanvas);
+
+            this.questCanvas.drawText(String.valueOf(tile.getRequiredCount()), tile.getTileRect().right,
+                    (Constants.QUEST_PANEL_HEIGH/2) + 10.0f, this.textPaint);
+        }
     }
 }

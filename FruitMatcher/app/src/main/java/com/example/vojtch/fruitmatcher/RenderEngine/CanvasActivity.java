@@ -9,14 +9,16 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
 
+import com.example.vojtch.fruitmatcher.Database.DatabaseEntity.LevelInfo;
 import com.example.vojtch.fruitmatcher.R;
 
 public class CanvasActivity extends Activity implements SurfaceHolder.Callback {
     private SurfaceView view;
     private Renderer renderer;
     private GameManager gameManager;
-    private static int level = -1;
+    private LevelInfo levelInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,23 +36,28 @@ public class CanvasActivity extends Activity implements SurfaceHolder.Callback {
         int height = getResources().getDisplayMetrics().heightPixels;
         this.renderer = new Renderer(width, height, getResources());
 
+        this.levelInfo = (LevelInfo)getIntent().getParcelableExtra("levelInfo");
 
-
-        if (level == -1) {
-            level = 1;
-            //throw new IllegalArgumentException("Level was not set!");
+        if (this.levelInfo == null){
+            throw new IllegalArgumentException("Level was not set");
         }
-        this.gameManager = new GameManager(level, this);
-    }
 
-    public static void setLevel(int lvl){
-        level = lvl;
+
+        this.gameManager = new GameManager(this.levelInfo, this);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent e) {
         this.gameManager.onTouch(e);
         tryDrawing(this.view.getHolder());
+
+        if (this.gameManager.isLevelWon()){
+            Toast.makeText(this,
+                    String.valueOf(this.levelInfo.getLevelId()) + ". Úroveň byla dokončena.",
+                    Toast.LENGTH_SHORT).show();
+
+            finish();
+        }
         return true;
     }
 
@@ -69,9 +76,6 @@ public class CanvasActivity extends Activity implements SurfaceHolder.Callback {
 
     }
 
-    public static void loadLevel(int level){
-
-    }
 
     private void tryDrawing(SurfaceHolder holder) {
         Canvas canvas = holder.lockCanvas();

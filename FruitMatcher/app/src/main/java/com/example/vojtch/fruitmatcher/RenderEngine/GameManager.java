@@ -5,10 +5,9 @@ import android.graphics.Point;
 import android.view.MotionEvent;
 import android.widget.Toast;
 
+import com.example.vojtch.fruitmatcher.Database.DatabaseEntity.LevelInfo;
 import com.example.vojtch.fruitmatcher.R;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -17,11 +16,13 @@ import java.util.Stack;
 
 
 public class GameManager {
+    private LevelInfo levelInfo;
+    private boolean levelWon = false;
+
     private HashMap<Point, Tile> gameTiles;
     private HashMap<Point, Tile> effectTiles;
     private Stack<Tile> selectedTiles;
 
-    private int level;
 
     private int bgId;
     private HashMap<String, Integer> quest;
@@ -35,10 +36,6 @@ public class GameManager {
     private int selectingId = -1;
     private int possibleComboSize = 0;
 
-
-    private Direction lastMotionDirection = Direction.None;
-    private Point startingPosition;
-
     private static int[] GameTileIds = {
             R.drawable.apple,
             R.drawable.banana,
@@ -51,15 +48,15 @@ public class GameManager {
     private int effectTile = R.drawable.selected;
 
 
-    public GameManager(int level, Context context){
+    public GameManager(LevelInfo levelInfo, Context context){
         this.gameTiles = new HashMap<Point, Tile>();
         this.effectTiles = new HashMap<Point, Tile>();
         this.selectedTiles = new Stack<Tile>();
-        this.level = level;
+        this.levelInfo = levelInfo;
         this.context = context;
 
 
-        loadLevel(this.level);
+        loadLevel();
     }
 
     private void deselectAllTiles(){
@@ -93,10 +90,9 @@ public class GameManager {
 
                 if (!combinationExist()) {
                     Toast.makeText(this.context, "No combination", Toast.LENGTH_SHORT).show();
-                    generateGameTileGrid();
+                    //generateGameTileGrid();
                 }
 
-                applyGravity();
                 refillGameGrid();
                 applyGravity();
                 break;
@@ -162,12 +158,32 @@ public class GameManager {
             this.wasCombo = true;
             int combo = this.selectedTiles.size();
 
+            FruitType fruitType = null;
+
             while (!this.selectedTiles.isEmpty()){
-                Point p = this.selectedTiles.pop().getPosition();
+                Tile tmp = this.selectedTiles.pop();
+                fruitType = tmp.getFruitType();
+                Point p = tmp.getPosition();
                 this.gameTiles.remove(p);
             }
+
+            this.levelInfo.setFruitCount(fruitType, (this.levelInfo.getFruitCount(fruitType) - combo));
             
-            Toast.makeText(context, "COMBO: " + String.valueOf(combo), Toast.LENGTH_SHORT).show();
+            //Toast.makeText(context, "COMBO: " + String.valueOf(combo), Toast.LENGTH_SHORT).show();
+            checkLevelWon();
+        }
+    }
+
+    private void checkLevelWon(){
+        if (    this.levelInfo.getAppleCount() <= 0 &&
+                this.levelInfo.getBananaCount() <= 0 &&
+                this.levelInfo.getBlueberryCount() <= 0 &&
+                this.levelInfo.getLemonCount() <= 0 &&
+                this.levelInfo.getOrangeCount() <= 0 &&
+                this.levelInfo.getStrawberryCount() <= 0){
+            //----------------------------------------
+            this.handleTouch = false;
+            this.levelWon = true;
         }
     }
     
@@ -296,6 +312,9 @@ public class GameManager {
             return false;
         }
 
+        if (this.selectedTiles.size() <= 0){
+            return false;
+        }
 
         Tile lastSelectedTile = this.selectedTiles.peek();
         int xDistance = Math.abs(lastSelectedTile.getPosition().x - tile.getPosition().x);
@@ -322,85 +341,9 @@ public class GameManager {
         }
     }
 
-    private Direction determineTouchDirection(int x, int y){
-
-        if (startingPosition.x == x && startingPosition.y == y)
-            return Direction.None;
-
-        if (startingPosition.x == x){
-            if (startingPosition.y > y)
-                return Direction.Up;
-            else
-                return Direction.Down;
-        }
-
-        if (startingPosition.y == y){
-            if (startingPosition.x > x)
-                return Direction.Left;
-            else
-                return Direction.Right;
-        }
-
-        if (startingPosition.x > x && startingPosition.y > y)
-            return Direction.UpLeft;
-        if (startingPosition.x < x && startingPosition.y > y)
-            return Direction.UpRight;
-        if (startingPosition.x > x && startingPosition.y < y)
-            return Direction.DownLeft;
-        if (startingPosition.x < x && startingPosition.y < y)
-            return Direction.DownRight;
-
-        return Direction.None;
-    }
-
-    private boolean isInverseDirection(Direction currentDirection){
-
-        if (this.lastMotionDirection == Direction.None)
-            return false;
-
-        if (this.lastMotionDirection == Direction.Up && currentDirection == Direction.Down)
-            return true;
-        if (this.lastMotionDirection == Direction.Down && currentDirection == Direction.Up)
-            return true;
-        if (this.lastMotionDirection == Direction.Left && currentDirection == Direction.Right)
-            return true;
-        if (this.lastMotionDirection == Direction.Right && currentDirection == Direction.Left)
-            return true;
-        if (this.lastMotionDirection == Direction.DownLeft && currentDirection == Direction.UpRight)
-            return true;
-        if (this.lastMotionDirection == Direction.DownRight && currentDirection == Direction.UpLeft)
-            return true;
-        if (this.lastMotionDirection == Direction.UpLeft && currentDirection == Direction.DownRight)
-            return true;
-        if (this.lastMotionDirection == Direction.UpRight && currentDirection == Direction.DownLeft)
-            return true;
-
-
-
-        return false;
-    }
-
-    private void loadLevel(int level){
-        Level lvl = new Level(level);
-
-        this.bgId = lvl.getBgResId();
-        this.levelTileCount = lvl.getTileCount();
-        this.quest = new HashMap<String, Integer>();
-        this.quest.put("apple", lvl.getAppleCount());
-        this.quest.put("banana", lvl.getBananaCount());
-        this.quest.put("blueberry", lvl.getBlueberryCount());
-        this.quest.put("lemon", lvl.getLemonCount());
-        this.quest.put("orange", lvl.getOrangeCount());
-        this.quest.put("strawberry", lvl.getStrawberryCount());
-
-        SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
-
-        this.timeLimit = null;
-        try {
-            this.timeLimit = format.parse(lvl.getLimit());
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+    private void loadLevel(){
+        this.bgId = R.drawable.bg;
+        this.levelTileCount = this.levelInfo.getTileCount();
 
         generateGameTileGrid();
     }
@@ -425,7 +368,7 @@ public class GameManager {
 
                 addTile(newTile);
 
-                newTile.setPosition(new Point(location.x, location.y - Constants.TILE_SIZE));
+                //newTile.setPosition(new Point(location.x, location.y - Constants.TILE_SIZE));
                 --this.levelTileCount;
             }
             if (this.levelTileCount < 1){
@@ -459,7 +402,8 @@ public class GameManager {
 
 
         if (!combinationExist()){
-            generateGameTileGrid();
+            Toast.makeText(this.context, "no combination", Toast.LENGTH_SHORT).show();
+            //generateGameTileGrid();
         }
     }
 
@@ -494,7 +438,11 @@ public class GameManager {
         return bgId;
     }
 
-    public Date getTimeLimit() {
-        return timeLimit;
+    public LevelInfo getLevelInfo(){
+        return this.levelInfo;
+    }
+
+    public boolean isLevelWon() {
+        return levelWon;
     }
 }
