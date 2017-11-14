@@ -1,4 +1,4 @@
-package com.example.vojtch.fruitmatcher.RenderEngine;
+package com.example.vojtch.fruitmatcher.GameEngine;
 
 import android.app.Activity;
 import android.graphics.Canvas;
@@ -11,7 +11,10 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import com.example.vojtch.fruitmatcher.Database.DBHandler;
 import com.example.vojtch.fruitmatcher.Database.DatabaseEntity.LevelInfo;
+import com.example.vojtch.fruitmatcher.Database.DatabaseEntity.PlayerInfo;
+import com.example.vojtch.fruitmatcher.FruitMatcherApp;
 import com.example.vojtch.fruitmatcher.R;
 
 public class CanvasActivity extends Activity implements SurfaceHolder.Callback {
@@ -52,6 +55,9 @@ public class CanvasActivity extends Activity implements SurfaceHolder.Callback {
         tryDrawing(this.view.getHolder());
 
         if (this.gameManager.isLevelWon()){
+
+            updatePlayerMaxLvl();
+
             Toast.makeText(this,
                     String.valueOf(this.levelInfo.getLevelId()) + ". Úroveň byla dokončena.",
                     Toast.LENGTH_SHORT).show();
@@ -59,6 +65,13 @@ public class CanvasActivity extends Activity implements SurfaceHolder.Callback {
             finish();
         }
         return true;
+    }
+
+    private void updatePlayerMaxLvl(){
+        PlayerInfo playerInfo = ((FruitMatcherApp)this.getApplication()).getPlayerInfo();
+        playerInfo.setMaxLevel(this.levelInfo.getLevelId());
+        DBHandler db = new DBHandler(this);
+        db.updatePlayerInfo(playerInfo);
     }
 
     @Override

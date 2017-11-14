@@ -316,8 +316,8 @@ public class DBHandler extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
 
         values.put(KEY_PLAYER_NAME, playerInfo.getName());
-        values.put(KEY_PLAYER_MAXLVL, 0);
-        values.put(KEY_PLAYER_PLAYED, "");
+        values.put(KEY_PLAYER_MAXLVL, playerInfo.getMaxLevel());
+        values.put(KEY_PLAYER_PLAYED, playerInfo.getPlayed());
 
         int rows = db.update(PLAYER_INFO_TABLE_NAME, values, KEY_PLAYER_ID + "=?", new String[] {String.valueOf(playerInfo.getId())});
 

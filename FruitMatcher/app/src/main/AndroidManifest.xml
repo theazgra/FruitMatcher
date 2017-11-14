@@ -3,6 +3,7 @@
     package="com.example.vojtch.fruitmatcher">
 
     <application
+        android:name=".FruitMatcherApp"
         android:allowBackup="true"
         android:icon="@drawable/banana"
         android:label="@string/app_name"
@@ -16,9 +17,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".RenderEngine.CanvasActivity" />
-        <activity android:name=".Highscore" />
-        <activity android:name=".LevelSelect"></activity>
+        <activity android:name=".GameEngine.CanvasActivity" />
+        <activity android:name=".LevelSelect" />
+        <activity
+            android:name=".PlayerSelect"
+            android:label="@string/title_activity_players"></activity>
     </application>
 
 </manifest>

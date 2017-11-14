@@ -3,7 +3,6 @@ package com.example.vojtch.fruitmatcher;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -12,7 +11,8 @@ import android.widget.Toast;
 
 import com.example.vojtch.fruitmatcher.Database.DBHandler;
 import com.example.vojtch.fruitmatcher.Database.DatabaseEntity.LevelInfo;
-import com.example.vojtch.fruitmatcher.RenderEngine.CanvasActivity;
+import com.example.vojtch.fruitmatcher.Database.DatabaseEntity.PlayerInfo;
+import com.example.vojtch.fruitmatcher.GameEngine.CanvasActivity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,6 +25,7 @@ public class LevelSelect extends Activity {
     private int lastExpandedGroupPosition = -1;
     private List<String> levelHeaders;
     private HashMap<String, LevelInfo> listDetail;
+    private PlayerInfo playerInfo;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -36,6 +37,7 @@ public class LevelSelect extends Activity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setContentView(R.layout.activity_level_select);
+        this.playerInfo = ((FruitMatcherApp)this.getApplication()).getPlayerInfo();
 
         expListView = (ExpandableListView)findViewById(R.id.expListView);
 
@@ -51,7 +53,7 @@ public class LevelSelect extends Activity {
             listDetail.put(lvlName, lvl);
         }
 
-        listAdapter = new ExpandableLevelSelectAdapter(this, this.levelHeaders, this.listDetail);
+        listAdapter = new ExpandableLevelSelectAdapter(this, this.levelHeaders, this.listDetail, this.playerInfo);
 
         expListView.setAdapter(listAdapter);
 
@@ -75,11 +77,21 @@ public class LevelSelect extends Activity {
                     expListView.collapseGroup(lastExpandedGroupPosition);
                 }
                 lastExpandedGroupPosition = groupPosition;
+
+                LevelInfo lvl = listDetail.get(levelHeaders.get(groupPosition));
+                if (lvl.getLevelId() > playerInfo.getMaxLevel() + 1){
+                    expListView.collapseGroup(groupPosition);
+                    lastExpandedGroupPosition = -1;
+                }
             }
         });
     }
 
     private void startLevel(LevelInfo level){
+        if (level.getLevelId() > playerInfo.getMaxLevel() + 1){
+            Toast.makeText(this, "Nepřístupné", Toast.LENGTH_SHORT).show();
+            return;
+        }
         Intent gameActivity = new Intent(this, CanvasActivity.class);
         gameActivity.putExtra("levelInfo", level);
         startActivity(gameActivity);

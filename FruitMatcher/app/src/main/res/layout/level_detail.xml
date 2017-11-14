@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/levelDetailTopLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@android:color/holo_orange_light"
@@ -74,7 +75,7 @@
                 android:layout_weight="1.01"
                 android:text="TextView"
                 android:textAlignment="center"
-                android:textColor="@android:color/black"/>
+                android:textColor="@android:color/black" />
 
             <ImageView
                 android:id="@+id/imgBanana"
@@ -89,7 +90,7 @@
                 android:layout_weight="1"
                 android:text="TextView"
                 android:textAlignment="center"
-                android:textColor="@android:color/black"/>
+                android:textColor="@android:color/black" />
 
         </LinearLayout>
 
@@ -111,7 +112,7 @@
                 android:layout_weight="1"
                 android:text="TextView"
                 android:textAlignment="center"
-                android:textColor="@android:color/black"/>
+                android:textColor="@android:color/black" />
 
             <ImageView
                 android:id="@+id/imgLemon"
@@ -126,7 +127,7 @@
                 android:layout_weight="1"
                 android:text="TextView"
                 android:textAlignment="center"
-                android:textColor="@android:color/black"/>
+                android:textColor="@android:color/black" />
         </LinearLayout>
 
         <LinearLayout
@@ -148,7 +149,7 @@
                 android:layout_weight="1"
                 android:text="TextView"
                 android:textAlignment="center"
-                android:textColor="@android:color/black"/>
+                android:textColor="@android:color/black" />
 
             <ImageView
                 android:id="@+id/imgStrawberry"
@@ -163,8 +164,7 @@
                 android:layout_weight="1"
                 android:text="TextView"
                 android:textAlignment="center"
-                android:textColor="@android:color/black"
-                />
+                android:textColor="@android:color/black" />
         </LinearLayout>
     </LinearLayout>
 

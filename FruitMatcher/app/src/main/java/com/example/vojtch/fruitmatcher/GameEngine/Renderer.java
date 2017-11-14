@@ -1,22 +1,18 @@
-package com.example.vojtch.fruitmatcher.RenderEngine;
+package com.example.vojtch.fruitmatcher.GameEngine;
 
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorSpace;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
-import android.os.CpuUsageInfo;
-import android.provider.CalendarContract;
 
 import com.example.vojtch.fruitmatcher.Database.DatabaseEntity.LevelInfo;
 import com.example.vojtch.fruitmatcher.R;
 
 import java.util.ArrayList;
-import java.util.StringTokenizer;
 
 public class Renderer {
 

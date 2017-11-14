@@ -2,15 +2,17 @@ package com.example.vojtch.fruitmatcher;
 
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.vojtch.fruitmatcher.Database.DBHandler;
 import com.example.vojtch.fruitmatcher.Database.DatabaseEntity.LevelInfo;
+import com.example.vojtch.fruitmatcher.Database.DatabaseEntity.PlayerInfo;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,10 +22,12 @@ public class ExpandableLevelSelectAdapter extends BaseExpandableListAdapter {
     private Context context;
     private List<String> levelHeaders;
     private HashMap<String, LevelInfo> listDetail;
+    private PlayerInfo playerInfo;
 
-    public ExpandableLevelSelectAdapter(Context context, List<String> headers, HashMap<String, LevelInfo> levelDetails){
+    public ExpandableLevelSelectAdapter(Context context, List<String> headers, HashMap<String, LevelInfo> levelDetails, PlayerInfo playerInfo){
         this.context = context;
         listDetail = new HashMap<String, LevelInfo>();
+        this.playerInfo = playerInfo;
 
         this.levelHeaders = headers;
         this.listDetail = levelDetails;
@@ -93,14 +97,27 @@ public class ExpandableLevelSelectAdapter extends BaseExpandableListAdapter {
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         String headerTitle = (String) getGroup(groupPosition);
+
+        int levelId = this.listDetail.get(headerTitle).getLevelId();
+
         if (convertView == null) {
             LayoutInflater infalInflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = infalInflater.inflate(R.layout.level_header, null);
         }
 
-        TextView header = (TextView) convertView.findViewById(R.id.lbLevelHeader);
-        header.setTypeface(null, Typeface.BOLD);
-        header.setText(headerTitle);
+        TextView headerText = (TextView) convertView.findViewById(R.id.lbLevelHeader);
+        LinearLayout header = (LinearLayout)convertView.findViewById(R.id.levelHeader);
+
+        //header.setBackgroundColor();
+        if (levelId > playerInfo.getMaxLevel() + 1){
+            header.setBackgroundColor(Color.LTGRAY);
+        }else{
+            header.setBackgroundColor(Color.YELLOW);
+        }
+
+
+        headerText.setTypeface(null, Typeface.BOLD);
+        headerText.setText(headerTitle);
 
         return convertView;
     }

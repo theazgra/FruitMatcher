@@ -1,4 +1,4 @@
-package com.example.vojtch.fruitmatcher.RenderEngine;
+package com.example.vojtch.fruitmatcher.GameEngine;
 
 import android.content.Context;
 import android.graphics.Point;

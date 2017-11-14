@@ -4,7 +4,7 @@ package com.example.vojtch.fruitmatcher.Database.DatabaseEntity;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.example.vojtch.fruitmatcher.RenderEngine.FruitType;
+import com.example.vojtch.fruitmatcher.GameEngine.FruitType;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
