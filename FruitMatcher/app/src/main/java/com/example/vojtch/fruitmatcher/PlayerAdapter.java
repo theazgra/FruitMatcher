@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -47,6 +48,7 @@ public class PlayerAdapter extends ArrayAdapter<PlayerInfo> {
             holder.lbMaxLevel = (TextView) row.findViewById(R.id.lbMaxLbl);
             holder.lbLastPlayed = (TextView) row.findViewById(R.id.lbLastPlayed);
             holder.bg = (LinearLayout)row.findViewById(R.id.playerBG);
+            holder.playerImg = (ImageView)row.findViewById(R.id.imgPlayer);
 
             row.setTag(holder);
         }
@@ -59,6 +61,8 @@ public class PlayerAdapter extends ArrayAdapter<PlayerInfo> {
         holder.lbName.setText("Hřáč: " + playerInfo.getName());
         holder.lbMaxLevel.setText("Maximální dosažená úroveň: " + playerInfo.getMaxLevel());
         holder.lbLastPlayed.setText("Naposledy hráno: " + playerInfo.getPlayed());
+        holder.playerImg.setImageBitmap(playerInfo.getPlayerImg());
+
 
         if (playerInfo.getId() == this.activePlayer.getId()){
             holder.bg.setBackgroundColor(Color.CYAN);
@@ -77,5 +81,6 @@ public class PlayerAdapter extends ArrayAdapter<PlayerInfo> {
         TextView lbMaxLevel;
         TextView lbLastPlayed;
         LinearLayout bg;
+        ImageView playerImg;
     }
 }

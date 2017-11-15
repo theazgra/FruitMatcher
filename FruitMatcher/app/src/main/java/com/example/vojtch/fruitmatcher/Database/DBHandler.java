@@ -5,18 +5,21 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.widget.Toast;
 
 import com.example.vojtch.fruitmatcher.Database.DatabaseEntity.LevelInfo;
 import com.example.vojtch.fruitmatcher.Database.DatabaseEntity.PlayerInfo;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class DBHandler extends SQLiteOpenHelper {
 
-    private static final int DB_VERSION = 2;
+    private static final int DB_VERSION = 3;
     private static final String DB_NAME = "FRUITY";
     private static final String LEVEL_INFO_TABLE_NAME = "level";
     private static final String PLAYER_INFO_TABLE_NAME = "player";
@@ -35,6 +38,7 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String KEY_PLAYER_NAME = "name";
     private static final String KEY_PLAYER_MAXLVL = "maxLevel";
     private static final String KEY_PLAYER_PLAYED = "lastPlayed";
+    private static final String KEY_PLAYER_IMAGE = "image";
 
     private Context context;
 
@@ -65,6 +69,7 @@ public class DBHandler extends SQLiteOpenHelper {
                 KEY_PLAYER_NAME + " TEXT NOT NULL, " +
                 KEY_PLAYER_MAXLVL + " INTEGER NOT NULL DEFAULT 0, " +
                 KEY_PLAYER_PLAYED + " TEXT, " +
+                KEY_PLAYER_IMAGE + " BLOB, " +
                 "FOREIGN KEY(" + KEY_PLAYER_MAXLVL + ") REFERENCES " + LEVEL_INFO_TABLE_NAME + "(" + KEY_LVL_ID + ") " +
                 ");";
 
@@ -237,9 +242,16 @@ public class DBHandler extends SQLiteOpenHelper {
         values.put(KEY_PLAYER_NAME, playerInfo.getName());
         values.put(KEY_PLAYER_MAXLVL, 0);
         values.put(KEY_PLAYER_PLAYED, "");
+        values.put(KEY_PLAYER_IMAGE, getBytes(playerInfo.getPlayerImg()));
 
         db.insert(PLAYER_INFO_TABLE_NAME, null, values);
         db.close();
+    }
+
+    private static byte[] getBytes(Bitmap bitmap){
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 75, stream);
+        return  stream.toByteArray();
     }
 
     public PlayerInfo getPlayerInfo(int id){
@@ -249,7 +261,8 @@ public class DBHandler extends SQLiteOpenHelper {
         Cursor cursor = db.query(PLAYER_INFO_TABLE_NAME,
                 new String[]{
                         KEY_PLAYER_ID, KEY_PLAYER_NAME,
-                        KEY_PLAYER_MAXLVL, KEY_PLAYER_PLAYED
+                        KEY_PLAYER_MAXLVL, KEY_PLAYER_PLAYED,
+                        KEY_PLAYER_IMAGE
                 },
                 KEY_PLAYER_ID +  "=?",
                 new String[]{String.valueOf(id)},
@@ -257,6 +270,11 @@ public class DBHandler extends SQLiteOpenHelper {
 
 
         if (cursor != null){
+            if (cursor.getCount() <= 0){
+                cursor.close();
+                db.close();
+                return null;
+            }
             cursor.moveToFirst();
             int cols = cursor.getColumnCount();
             int i = -1;
@@ -264,7 +282,8 @@ public class DBHandler extends SQLiteOpenHelper {
                     cursor.getInt(++i),
                     cursor.getString(++i),
                     cursor.getInt(++i),
-                    cursor.getString(++i)
+                    cursor.getString(++i),
+                    BitmapFactory.decodeByteArray(cursor.getBlob(++i), 0, cursor.getBlob(i).length)
             );
             cursor.close();
             db.close();
@@ -289,7 +308,8 @@ public class DBHandler extends SQLiteOpenHelper {
                         cursor.getInt(++i),
                         cursor.getString(++i),
                         cursor.getInt(++i),
-                        cursor.getString(++i)
+                        cursor.getString(++i),
+                        BitmapFactory.decodeByteArray(cursor.getBlob(++i), 0, cursor.getBlob(i).length)
                 );
                 players.add(playerInfo);
 
@@ -318,6 +338,7 @@ public class DBHandler extends SQLiteOpenHelper {
         values.put(KEY_PLAYER_NAME, playerInfo.getName());
         values.put(KEY_PLAYER_MAXLVL, playerInfo.getMaxLevel());
         values.put(KEY_PLAYER_PLAYED, playerInfo.getPlayed());
+        values.put(KEY_PLAYER_IMAGE, getBytes(playerInfo.getPlayerImg()));
 
         int rows = db.update(PLAYER_INFO_TABLE_NAME, values, KEY_PLAYER_ID + "=?", new String[] {String.valueOf(playerInfo.getId())});
 

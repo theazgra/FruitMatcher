@@ -10,18 +10,22 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".GameActivity">
+        <activity android:name=".GameActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".GameEngine.CanvasActivity" />
-        <activity android:name=".LevelSelect" />
+        <activity android:name=".GameEngine.CanvasActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".LevelSelect"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".PlayerSelect"
-            android:label="@string/title_activity_players"></activity>
+            android:label="@string/title_activity_players"
+            android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>

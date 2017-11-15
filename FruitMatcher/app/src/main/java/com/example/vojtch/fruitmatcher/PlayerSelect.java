@@ -2,13 +2,17 @@ package com.example.vojtch.fruitmatcher;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.app.Activity;
+import android.provider.MediaStore;
 import android.text.InputType;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -23,6 +27,8 @@ import java.util.List;
 public class PlayerSelect extends Activity {
 
     private ListView listView;
+    private int CAMERA_INTENT_CODE = 9894;
+    private Bitmap img = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +88,7 @@ public class PlayerSelect extends Activity {
 
     private void addNewPlayer(String newPlayerName){
         PlayerInfo newPlayer = new PlayerInfo(newPlayerName);
+        newPlayer.setPlayerImg(this.img);
         DBHandler db = new DBHandler(this);
         db.addPlayerInfo(newPlayer);
 
@@ -93,8 +100,20 @@ public class PlayerSelect extends Activity {
         builder.setTitle("Nový hráč");
 
         final EditText input = new EditText(this);
+        final Button addPhoto = new Button(this);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         builder.setView(input);
+        builder.setView(addPhoto);
+
+        addPhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent camera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (camera.resolveActivity(getPackageManager()) != null){
+                    startActivityForResult(camera, CAMERA_INTENT_CODE);
+                }
+            }
+        });
 
         builder.setPositiveButton("Přidat", new DialogInterface.OnClickListener() {
             @Override
@@ -111,5 +130,14 @@ public class PlayerSelect extends Activity {
         });
 
         builder.show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == CAMERA_INTENT_CODE && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            this.img = imageBitmap;
+        }
     }
 }
