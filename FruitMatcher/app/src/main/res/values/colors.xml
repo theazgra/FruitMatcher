@@ -5,4 +5,8 @@
     <color name="colorAccent">#FF4081</color>
     <color name="inactiveLevel">@android:color/darker_gray</color>
     <color name="black_overlay">#66000000</color>
+    <color name="levelDetail">#D265F3</color>
+    <color name="mainScreen">#F2CAA7</color>
+    <color name="playerInactive">@android:color/holo_orange_dark</color>
+    <color name="playerActive">@android:color/holo_red_light</color>
 </resources>

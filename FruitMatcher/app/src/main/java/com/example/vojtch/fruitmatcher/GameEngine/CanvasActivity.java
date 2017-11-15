@@ -16,6 +16,7 @@ import com.example.vojtch.fruitmatcher.Database.DatabaseEntity.LevelInfo;
 import com.example.vojtch.fruitmatcher.Database.DatabaseEntity.PlayerInfo;
 import com.example.vojtch.fruitmatcher.FruitMatcherApp;
 import com.example.vojtch.fruitmatcher.R;
+import com.example.vojtch.fruitmatcher.SoundFactory;
 
 public class CanvasActivity extends Activity implements SurfaceHolder.Callback {
     private SurfaceView view;
@@ -46,7 +47,7 @@ public class CanvasActivity extends Activity implements SurfaceHolder.Callback {
         }
 
 
-        this.gameManager = new GameManager(this.levelInfo, this);
+        this.gameManager = new GameManager(this.levelInfo, this, ((FruitMatcherApp)this.getApplication()).isSoundOn());
     }
 
     @Override
@@ -56,12 +57,14 @@ public class CanvasActivity extends Activity implements SurfaceHolder.Callback {
 
         if (this.gameManager.isLevelWon()){
 
+            SoundFactory.playSound(this, R.raw.congratulation);
             updatePlayerMaxLvl();
 
             Toast.makeText(this,
                     String.valueOf(this.levelInfo.getLevelId()) + ". Úroveň byla dokončena.",
                     Toast.LENGTH_SHORT).show();
 
+            setResult(RESULT_OK);
             finish();
         }
         return true;

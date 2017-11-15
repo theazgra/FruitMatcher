@@ -4,7 +4,7 @@
     android:id="@+id/levelHeader"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:background="@android:color/holo_orange_dark"
+    android:background="@android:color/holo_purple"
     android:orientation="vertical"
     android:padding="8dp">
 
@@ -14,8 +14,9 @@
         android:layout_height="wrap_content"
         android:paddingLeft="?android:attr/expandableListPreferredItemPaddingLeft"
         android:textAlignment="viewStart"
-        android:textColor="#000000"
+        android:textColor="?android:attr/colorForegroundInverse"
         android:textSize="17dp"
+        android:textStyle="bold"
         tools:text="1. Úroveň" />
 
 </LinearLayout>

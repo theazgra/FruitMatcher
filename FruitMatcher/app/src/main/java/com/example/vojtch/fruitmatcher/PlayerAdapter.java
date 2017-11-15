@@ -1,6 +1,7 @@
 package com.example.vojtch.fruitmatcher;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,13 +25,15 @@ public class PlayerAdapter extends ArrayAdapter<PlayerInfo> {
     private int layoutResourceId;
 
     private PlayerInfo activePlayer;
+    private Resources resources;
 
-    public PlayerAdapter(Context context, int layoutResourceId, List<PlayerInfo> data, PlayerInfo activePlayer) {
+    public PlayerAdapter(Context context, int layoutResourceId, List<PlayerInfo> data, PlayerInfo activePlayer, Resources res) {
         super(context, layoutResourceId, data);
         this.layoutResourceId = layoutResourceId;
         this.context = context;
         this.players = data;
         this.activePlayer = activePlayer;
+        this.resources = res;
     }
 
     @Override
@@ -65,10 +68,10 @@ public class PlayerAdapter extends ArrayAdapter<PlayerInfo> {
 
 
         if (playerInfo.getId() == this.activePlayer.getId()){
-            holder.bg.setBackgroundColor(Color.CYAN);
+            holder.bg.setBackgroundColor(this.resources.getColor(R.color.playerActive, null));
         }
         else {
-            holder.bg.setBackgroundColor(Color.WHITE);
+            holder.bg.setBackgroundColor(this.resources.getColor(R.color.playerInactive, null));
         }
 
         return row;

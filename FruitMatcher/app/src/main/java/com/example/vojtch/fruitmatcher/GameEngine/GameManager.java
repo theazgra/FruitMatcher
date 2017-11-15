@@ -7,6 +7,7 @@ import android.widget.Toast;
 
 import com.example.vojtch.fruitmatcher.Database.DatabaseEntity.LevelInfo;
 import com.example.vojtch.fruitmatcher.R;
+import com.example.vojtch.fruitmatcher.SoundFactory;
 
 import java.util.Collection;
 import java.util.Date;
@@ -46,15 +47,16 @@ public class GameManager {
     };
 
     private int effectTile = R.drawable.selected;
+    private boolean soundOn = false;
 
 
-    public GameManager(LevelInfo levelInfo, Context context){
+    public GameManager(LevelInfo levelInfo, Context context, boolean soundOn){
         this.gameTiles = new HashMap<Point, Tile>();
         this.effectTiles = new HashMap<Point, Tile>();
         this.selectedTiles = new Stack<Tile>();
         this.levelInfo = levelInfo;
         this.context = context;
-
+        this.soundOn = soundOn;
 
         loadLevel();
     }
@@ -158,6 +160,15 @@ public class GameManager {
             this.wasCombo = true;
             int combo = this.selectedTiles.size();
 
+            if (this.soundOn){
+                if (combo < 5){
+                    SoundFactory.playSound(this.context, R.raw.match);
+                }
+                else{
+                    SoundFactory.playSound(this.context, R.raw.combo);
+                }
+            }
+
             FruitType fruitType = null;
 
             while (!this.selectedTiles.isEmpty()){
@@ -168,8 +179,7 @@ public class GameManager {
             }
 
             this.levelInfo.setFruitCount(fruitType, (this.levelInfo.getFruitCount(fruitType) - combo));
-            
-            //Toast.makeText(context, "COMBO: " + String.valueOf(combo), Toast.LENGTH_SHORT).show();
+
             checkLevelWon();
         }
     }

@@ -26,6 +26,7 @@ public class LevelSelect extends Activity {
     private List<String> levelHeaders;
     private HashMap<String, LevelInfo> listDetail;
     private PlayerInfo playerInfo;
+    private int GAME_ACTIVITY_CODE = 357;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -37,31 +38,15 @@ public class LevelSelect extends Activity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setContentView(R.layout.activity_level_select);
-        this.playerInfo = ((FruitMatcherApp)this.getApplication()).getPlayerInfo();
 
         expListView = (ExpandableListView)findViewById(R.id.expListView);
 
-        levelHeaders = new ArrayList<String>();
-        listDetail = new HashMap<String, LevelInfo>();
-
-        DBHandler db = new DBHandler(this);
-        List<LevelInfo> levels = db.getLevels();
-
-        for (LevelInfo lvl : levels){
-            String lvlName = lvl.getLevelId() + ". Úroveň";
-            levelHeaders.add(lvlName);
-            listDetail.put(lvlName, lvl);
-        }
-
-        listAdapter = new ExpandableLevelSelectAdapter(this, this.levelHeaders, this.listDetail, this.playerInfo);
-
-        expListView.setAdapter(listAdapter);
+        loadList();
 
         expListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView expandableListView, View view, int groupPosition, int childPosition, long id) {
-                    //Log.d("group pos", String.valueOf(groupPosition));
-                    //Log.d("child pos", String.valueOf(childPosition));
+
 
                 LevelInfo lvl = listDetail.get(levelHeaders.get(groupPosition));
                 startLevel(lvl);
@@ -80,11 +65,36 @@ public class LevelSelect extends Activity {
 
                 LevelInfo lvl = listDetail.get(levelHeaders.get(groupPosition));
                 if (lvl.getLevelId() > playerInfo.getMaxLevel() + 1){
+
+
+                    if (((FruitMatcherApp)getApplication()).isSoundOn()){
+                        SoundFactory.playSound(getApplication(), R.raw.not_prepared);
+                    }
+
                     expListView.collapseGroup(groupPosition);
                     lastExpandedGroupPosition = -1;
                 }
             }
         });
+    }
+
+    private void loadList(){
+        this.playerInfo = ((FruitMatcherApp)this.getApplication()).getPlayerInfo();
+        levelHeaders = new ArrayList<String>();
+        listDetail = new HashMap<String, LevelInfo>();
+
+        DBHandler db = new DBHandler(this);
+        List<LevelInfo> levels = db.getLevels();
+
+        for (LevelInfo lvl : levels){
+            String lvlName = lvl.getLevelId() + ". Úroveň";
+            levelHeaders.add(lvlName);
+            listDetail.put(lvlName, lvl);
+        }
+
+        listAdapter = new ExpandableLevelSelectAdapter(this, this.levelHeaders, this.listDetail, this.playerInfo);
+
+        expListView.setAdapter(listAdapter);
     }
 
     private void startLevel(LevelInfo level){
@@ -94,6 +104,14 @@ public class LevelSelect extends Activity {
         }
         Intent gameActivity = new Intent(this, CanvasActivity.class);
         gameActivity.putExtra("levelInfo", level);
-        startActivity(gameActivity);
+
+        startActivityForResult(gameActivity, this.GAME_ACTIVITY_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == this.GAME_ACTIVITY_CODE && resultCode == RESULT_OK){
+            loadList();
+        }
     }
 }

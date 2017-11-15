@@ -110,9 +110,9 @@ public class ExpandableLevelSelectAdapter extends BaseExpandableListAdapter {
 
         //header.setBackgroundColor();
         if (levelId > playerInfo.getMaxLevel() + 1){
-            header.setBackgroundColor(Color.LTGRAY);
+            header.setBackgroundColor(Color.rgb(89, 39, 104));
         }else{
-            header.setBackgroundColor(Color.YELLOW);
+            header.setBackgroundColor(Color.rgb(170, 66, 204));
         }
 
 
