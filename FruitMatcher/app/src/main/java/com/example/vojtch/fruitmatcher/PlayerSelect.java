@@ -14,6 +14,7 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -98,12 +99,16 @@ public class PlayerSelect extends Activity {
     public void onAddPlayerClick(View v){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Nový hráč");
+        builder.setView(R.layout.add_player_dialog);
 
-        final EditText input = new EditText(this);
-        final Button addPhoto = new Button(this);
-        input.setInputType(InputType.TYPE_CLASS_TEXT);
-        builder.setView(input);
-        builder.setView(addPhoto);
+        //final EditText input = new EditText(this);
+        //final Button addPhoto = new Button(this);
+        final EditText input = (EditText)findViewById(R.id.editName);
+        final Button addPhoto = (Button)findViewById(R.id.btnAddImg);
+        final ImageView img = (ImageView)findViewById(R.id.imgPlayerAdd);
+        //input.setInputType(InputType.TYPE_CLASS_TEXT);
+        //builder.setView(input);
+        //builder.setView(addPhoto);
 
         addPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
