@@ -1,18 +1,25 @@
 package com.example.vojtch.fruitmatcher.GameEngine;
 
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.support.constraint.ConstraintLayout;
+import android.util.Log;
 
 import com.example.vojtch.fruitmatcher.Database.DatabaseEntity.LevelInfo;
 import com.example.vojtch.fruitmatcher.R;
 
 import java.util.ArrayList;
+import java.util.Random;
+import java.util.concurrent.CompletionService;
+import java.util.logging.Level;
 
 public class Renderer {
 
@@ -35,8 +42,11 @@ public class Renderer {
 
     private Paint textPaint;
     private Paint rectPaint;
+    Paint progRectPain;
 
     private ArrayList<Tile> questTiles =  null;
+
+    private int neededNumberOfFruit = 99999;
 
     public Renderer(int width, int height, Resources resources){
         updateBitmapResolution(width, height);
@@ -53,6 +63,9 @@ public class Renderer {
         this.rectPaint.setColor(Color.BLUE);
         this.rectPaint.setStrokeWidth(15.0f);
         this.rectPaint.setStyle(Paint.Style.STROKE);
+
+        progRectPain = new Paint();
+        progRectPain.setStyle(Paint.Style.FILL);
     }
 
     public void updateBitmapResolution(int width, int height){
@@ -86,6 +99,7 @@ public class Renderer {
 
         this.gameGridCanvas.drawRGB(20, 20, 20);
         this.questCanvas.drawRGB(255, 136, 20);
+        this.coctailCanvas.drawRGB(0, 0, 0);
 
 
         //Game grid
@@ -104,28 +118,26 @@ public class Renderer {
         }
 
 
-        //this.questCanvas.drawRGB(0,0,255);
+
         drawQuestPanel(gameManager.getLevelInfo());
-
-        this.coctailCanvas.drawRGB(150,0,255);
-
+        drawCocktailPanel(gameManager.getLevelInfo());
 
         this.masterCanvas.drawBitmap(
                 this.gameGridBitmap,
-                Constants.GRID_X_OFFSET,
+                Constants.X_OFFSET,
                 Constants.GRID_Y_OFFSET,
                 null);
 
         this.masterCanvas.drawBitmap(
                 this.questBitmap,
-                Constants.Quest_X_OFFSET,
+                Constants.X_OFFSET,
                 Constants.QUEST_Y_OFFSET,
                 null
         );
 
         this.masterCanvas.drawBitmap(
                 this.coctailBitmap,
-                0,
+                Constants.X_OFFSET,
                 0,
                 null
         );
@@ -190,5 +202,51 @@ public class Renderer {
             this.questCanvas.drawText(String.valueOf(tile.getRequiredCount()), tile.getTileRect().right,
                     (Constants.QUEST_PANEL_HEIGH/2) + 10.0f, this.textPaint);
         }
+
+        this.questCanvas.drawText("Number of ripening fruit: " + String.valueOf(levelInfo.getTileCount()),
+                50, (Constants.QUEST_PANEL_HEIGH - 20.0f), this.textPaint);
+    }
+
+    private void drawCocktailPanel(LevelInfo levelInfo){
+
+        if (this.neededNumberOfFruit == 99999){
+            this.neededNumberOfFruit = 0;
+            for (FruitType fruit : FruitType.values()){
+                this.neededNumberOfFruit += levelInfo.getFruitCount(fruit);
+            }
+        }
+
+        int actualNeededNumberOfFruit = 0;
+        for (FruitType fruit : FruitType.values()){
+            actualNeededNumberOfFruit += levelInfo.getFruitCount(fruit);
+        }
+
+        float percentDone = 1.0f - (float)((float)actualNeededNumberOfFruit / (float)this.neededNumberOfFruit);
+        int rectHeight = (int)(Constants.COCTAIL_PANEL_HEIGHT * percentDone);
+
+        Log.d("perc done", String.valueOf(percentDone));
+        Log.d("rect he", String.valueOf(rectHeight));
+        int bottom = Constants.COCTAIL_PANEL_HEIGHT - 15;
+        Rect progressRect = new Rect(
+                Constants.COCTAIL_PANEL_WIDTH / 2 - 200,
+                bottom + rectHeight,
+                Constants.COCTAIL_PANEL_WIDTH / 2 + 200,
+                bottom);
+
+        progRectPain.setColor(randomColor());
+        this.coctailCanvas.drawRect(progressRect, progRectPain);
+
+
+        Drawable d = getDrawable(R.drawable.cocktail_mask);
+        d.setBounds(0, 0, Constants.COCTAIL_PANEL_WIDTH, Constants.COCTAIL_PANEL_HEIGHT);
+        d.draw(this.coctailCanvas);
+    }
+
+    private int randomColor(){
+        Random rnd = new Random();
+        int r = 75 + rnd.nextInt(100);
+        int g = 75 + rnd.nextInt(100);
+        int b = 75 + rnd.nextInt(100);
+        return Color.rgb(r,g,b);
     }
 }

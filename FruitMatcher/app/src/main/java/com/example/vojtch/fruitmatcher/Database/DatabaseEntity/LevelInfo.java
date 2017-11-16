@@ -45,6 +45,10 @@ public class LevelInfo implements Parcelable {
         }
     }
 
+    public void setTileCount(int count){
+        this.tileCount = count;
+    }
+
     public Date getTimeLimitDateFormat(){
         return this.timeLimitDateFormat;
     }
@@ -127,7 +131,7 @@ public class LevelInfo implements Parcelable {
     }
 
     public int getTileCount() {
-        return tileCount;
+        return tileCount >= 0 ? tileCount : 0;
     }
 
     public int getAppleCount() {

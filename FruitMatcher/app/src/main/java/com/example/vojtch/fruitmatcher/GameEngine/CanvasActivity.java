@@ -47,8 +47,11 @@ public class CanvasActivity extends Activity implements SurfaceHolder.Callback {
         }
 
 
+
         this.gameManager = new GameManager(this.levelInfo, this, ((FruitMatcherApp)this.getApplication()).isSoundOn());
+        this.gameManager.setActivityUnderHood(this);
     }
+
 
     @Override
     public boolean onTouchEvent(MotionEvent e) {

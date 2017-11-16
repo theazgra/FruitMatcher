@@ -106,7 +106,7 @@ public class MainActivity extends Activity {
                 break;
         }
 
-        return true;
+        return false;
     }
 
     private void loadPreferences(){

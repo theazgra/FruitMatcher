@@ -1,5 +1,6 @@
 package com.example.vojtch.fruitmatcher.GameEngine;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Point;
 import android.view.MotionEvent;
@@ -10,7 +11,7 @@ import com.example.vojtch.fruitmatcher.R;
 import com.example.vojtch.fruitmatcher.SoundFactory;
 
 import java.util.Collection;
-import java.util.Date;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Stack;
@@ -19,6 +20,7 @@ import java.util.Stack;
 public class GameManager {
     private LevelInfo levelInfo;
     private boolean levelWon = false;
+    private boolean isAlive = true;
 
     private HashMap<Point, Tile> gameTiles;
     private HashMap<Point, Tile> effectTiles;
@@ -26,8 +28,6 @@ public class GameManager {
 
 
     private int bgId;
-    private HashMap<String, Integer> quest;
-    private Date timeLimit;
     private int levelTileCount;
 
     private Context context;
@@ -36,6 +36,9 @@ public class GameManager {
     private boolean wasCombo = false;
     private int selectingId = -1;
     private int possibleComboSize = 0;
+
+    private int shuffleCount = 0;
+
 
     private static int[] GameTileIds = {
             R.drawable.apple,
@@ -49,14 +52,20 @@ public class GameManager {
     private int effectTile = R.drawable.selected;
     private boolean soundOn = false;
 
+    private Activity activityUnderHood = null;
 
-    public GameManager(LevelInfo levelInfo, Context context, boolean soundOn){
+
+
+
+    public GameManager(LevelInfo levelInfo, Context context, final boolean soundOn){
         this.gameTiles = new HashMap<Point, Tile>();
         this.effectTiles = new HashMap<Point, Tile>();
         this.selectedTiles = new Stack<Tile>();
         this.levelInfo = levelInfo;
         this.context = context;
         this.soundOn = soundOn;
+
+
 
         loadLevel();
     }
@@ -90,18 +99,20 @@ public class GameManager {
 
                 deselectAllTiles();
 
-                if (!combinationExist()) {
-                    Toast.makeText(this.context, "No combination", Toast.LENGTH_SHORT).show();
-                    //generateGameTileGrid();
-                }
-
                 refillGameGrid();
                 applyGravity();
+
+                while(!combinationExist() && isAlive ){
+                    shuffleGameGrid();
+                }
+
                 break;
             }
 
         }
     }
+
+
 
     private void applyGravity(){
         for (int x = 0; x < Constants.GAME_SQUARE_SIZE; x++) {
@@ -213,6 +224,7 @@ public class GameManager {
                     continue;
 
                 if (checkCombinationFromTile(tile, null)){
+                    this.shuffleCount = 0;
                     return true;
                 }
             }
@@ -282,10 +294,10 @@ public class GameManager {
 
     private void setSelectedTiles(int x, int y, boolean firstTouch){
 
-        if (x > Constants.GRID_X_OFFSET && x < Constants.GAME_GRID_WIDTH + Constants.GRID_X_OFFSET &&
+        if (x > Constants.X_OFFSET && x < Constants.GAME_GRID_WIDTH + Constants.X_OFFSET &&
             y > Constants.GRID_Y_OFFSET && y < Constants.GAME_GRID_HEIGHT + Constants.GRID_Y_OFFSET){
 
-            x = (x - Constants.GRID_X_OFFSET) / Constants.TILE_SIZE;
+            x = (x - Constants.X_OFFSET) / Constants.TILE_SIZE;
             y = (y - Constants.GRID_Y_OFFSET) / Constants.TILE_SIZE;
 
             Point touchedTilePosition = new Point(x * Constants.TILE_SIZE, y * Constants.TILE_SIZE);
@@ -365,6 +377,7 @@ public class GameManager {
     }
 
     private void refillGameGrid(){
+        this.levelInfo.setTileCount(this.levelTileCount);
         if (this.levelTileCount < 1 || !this.wasCombo){
             return;
         }
@@ -382,10 +395,46 @@ public class GameManager {
                 --this.levelTileCount;
             }
             if (this.levelTileCount < 1){
-                return;
+                break;
             }
         }
+        this.levelInfo.setTileCount(this.levelTileCount);
     }
+
+    private void shuffleGameGrid()
+    {
+        if (this.shuffleCount > 10){
+            endActivity();
+            return;
+        }
+
+        ++this.shuffleCount;
+        Stack<Tile> tilesOnGrid = new Stack<Tile>();
+
+        for (Tile t : this.gameTiles.values()){
+            tilesOnGrid.push(t);
+        }
+
+        this.gameTiles.clear();
+
+        Collections.shuffle(tilesOnGrid);
+
+        for (int y = Constants.GAME_SQUARE_SIZE - 1; y >= 0 ; y--) {
+            for (int x = 0; x < Constants.GAME_SQUARE_SIZE; x++) {
+                if (tilesOnGrid.size() > 0){
+                    Tile t = tilesOnGrid.pop();
+                    Point position = new Point(x * Constants.TILE_SIZE, y * Constants.TILE_SIZE);
+                    addTile(new Tile(position, randomGameTileId(), TileType.GameTile));
+                }
+                else {
+                    return;
+                }
+            }
+        }
+
+
+    }
+
 
     private void generateGameTileGrid(){
         gameTiles.clear();
@@ -454,5 +503,19 @@ public class GameManager {
 
     public boolean isLevelWon() {
         return levelWon;
+    }
+
+    private void endActivity(){
+        if (this.activityUnderHood != null){
+            this.activityUnderHood.setResult(Activity.RESULT_CANCELED);
+            this.activityUnderHood.finish();
+            this.isAlive = false;
+            Toast.makeText(this.context, "Game Over", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    public void setActivityUnderHood(Activity a){
+        this.activityUnderHood = a;
     }
 }
