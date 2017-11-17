@@ -222,14 +222,14 @@ public class Renderer {
         }
 
         float percentDone = 1.0f - (float)((float)actualNeededNumberOfFruit / (float)this.neededNumberOfFruit);
-        int rectHeight = (int)(Constants.COCTAIL_PANEL_HEIGHT * percentDone);
+        int rectHeight = (int)((Constants.COCTAIL_PANEL_HEIGHT-15) * percentDone);
 
         Log.d("perc done", String.valueOf(percentDone));
         Log.d("rect he", String.valueOf(rectHeight));
         int bottom = Constants.COCTAIL_PANEL_HEIGHT - 15;
         Rect progressRect = new Rect(
                 Constants.COCTAIL_PANEL_WIDTH / 2 - 200,
-                bottom + rectHeight,
+                bottom - rectHeight,
                 Constants.COCTAIL_PANEL_WIDTH / 2 + 200,
                 bottom);
 
