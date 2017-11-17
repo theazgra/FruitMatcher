@@ -19,7 +19,7 @@ import java.util.List;
 
 public class DBHandler extends SQLiteOpenHelper {
 
-    private static final int DB_VERSION = 3;
+    private static final int DB_VERSION = 4;
     private static final String DB_NAME = "FRUITY";
     private static final String LEVEL_INFO_TABLE_NAME = "level";
     private static final String PLAYER_INFO_TABLE_NAME = "player";
@@ -91,27 +91,28 @@ public class DBHandler extends SQLiteOpenHelper {
     public void insertLevels(){
         //level, limit, tileLimit, apple, banana, blueberry, lemon, orange, strawberry
         addLevelInfo(new LevelInfo(1, "00:05:00", 200, 5, 5, 5, 5, 5, 5));
-        addLevelInfo(new LevelInfo(2, "00:05:00", 200, 25, 5, 30, 5, 40, 5));
-        addLevelInfo(new LevelInfo(3, "00:05:00", 180, 5, 25, 5, 5, 10, 5));
+        addLevelInfo(new LevelInfo(2, "00:05:00", 200, 20, 5, 30, 5, 15, 5));
+        addLevelInfo(new LevelInfo(3, "00:05:00", 55, 3, 0, 5, 5, 3, 5));
         addLevelInfo(new LevelInfo(4, "00:04:00", 150, 10, 10, 10, 10, 10, 10));
         addLevelInfo(new LevelInfo(5, "00:04:00", 100, 5, 5, 5, 5, 5, 5));
         addLevelInfo(new LevelInfo(6, "00:02:00", 300, 30, 30, 30, 30, 30, 30));
         addLevelInfo(new LevelInfo(7, "00:03:00", 150, 5, 25, 5, 35, 5, 5));
         addLevelInfo(new LevelInfo(8, "00:01:30", 200, 20, 0, 5, 0, 5, 20));
         addLevelInfo(new LevelInfo(9, "00:02:00", 140, 5, 18, 5, 20, 5, 5));
-        addLevelInfo(new LevelInfo(10, "00:02:00", 240, 40, 40, 5, 40, 5, 10));
+        addLevelInfo(new LevelInfo(10, "00:02:00", 240, 14, 20, 5, 30, 5, 10));
 
         //not configured
         addLevelInfo(new LevelInfo(11, "00:05:00", 200, 5, 5, 5, 5, 5, 5));
-        addLevelInfo(new LevelInfo(12, "00:05:00", 200, 25, 5, 30, 5, 40, 5));
-        addLevelInfo(new LevelInfo(13, "00:05:00", 180, 5, 25, 5, 5, 10, 5));
+        addLevelInfo(new LevelInfo(12, "00:05:00", 300, 25, 15, 30, 21, 40, 5));
+        addLevelInfo(new LevelInfo(13, "00:05:00", 180, 5, 25, 5, 5, 15, 5));
         addLevelInfo(new LevelInfo(14, "00:04:00", 150, 10, 10, 10, 10, 10, 10));
-        addLevelInfo(new LevelInfo(15, "00:04:00", 100, 5, 5, 5, 5, 5, 5));
-        addLevelInfo(new LevelInfo(16, "00:02:00", 300, 30, 30, 30, 30, 30, 30));
-        addLevelInfo(new LevelInfo(17, "00:03:00", 150, 5, 25, 5, 35, 5, 5));
-        addLevelInfo(new LevelInfo(18, "00:01:30", 200, 20, 0, 5, 0, 5, 20));
-        addLevelInfo(new LevelInfo(19, "00:02:00", 140, 5, 18, 5, 20, 5, 5));
-        addLevelInfo(new LevelInfo(20, "00:02:00", 240, 40, 40, 5, 40, 5, 10));
+        addLevelInfo(new LevelInfo(15, "00:04:00", 100, 5, 5, 15, 16, 5, 5));
+        addLevelInfo(new LevelInfo(16, "00:02:00", 999, 100, 40, 30, 20, 0, 10));
+        addLevelInfo(new LevelInfo(17, "00:03:00", 150, 5, 25, 18, 19, 5, 5));
+        addLevelInfo(new LevelInfo(18, "00:01:30", 80, 12, 0, 5, 0, 5, 8));
+        addLevelInfo(new LevelInfo(19, "00:02:00", 140, 5, 15, 5, 20, 5, 5));
+        addLevelInfo(new LevelInfo(20, "00:02:00", 9999, 100, 100, 100, 100, 100, 100));
+        addLevelInfo(new LevelInfo(21, "00:02:00", 99999, 1000, 1000, 1000, 1000, 1000, 1000));
     }
 
     public void addLevelInfo(LevelInfo levelInfo){
