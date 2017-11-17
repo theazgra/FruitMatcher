@@ -1,5 +1,7 @@
 package com.example.vojtch.fruitmatcher.GameEngine;
 
+import android.media.MediaPlayer;
+
 public class Constants {
     public static final int TILE_SIZE = 100;
     public static final int GAME_SQUARE_SIZE = 10;
@@ -19,4 +21,10 @@ public class Constants {
     public static final int COCTAIL_PANEL_HEIGHT = HEIGHT - GAME_GRID_HEIGHT - QUEST_PANEL_HEIGH;
 
     public static final int QUEST_Y_OFFSET = GRID_Y_OFFSET - QUEST_PANEL_HEIGH;
+
+    private static MediaPlayer mediaPlayer = new MediaPlayer();
+
+    public static MediaPlayer getMediaPlayer(){
+        return mediaPlayer;
+    }
 }

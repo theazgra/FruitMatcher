@@ -2,7 +2,6 @@ package com.example.vojtch.fruitmatcher;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,9 +11,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.vojtch.fruitmatcher.Database.DatabaseEntity.PlayerInfo;
-
-import org.w3c.dom.Text;
-
 import java.util.List;
 
 
