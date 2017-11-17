@@ -67,12 +67,18 @@ public class PlayerAdapter extends ArrayAdapter<PlayerInfo> {
         holder.playerImg.setImageBitmap(playerInfo.getPlayerImg());
 
 
-        if (playerInfo.getId() == this.activePlayer.getId()){
-            holder.bg.setBackgroundColor(this.resources.getColor(R.color.playerActive, null));
+        if (this.activePlayer != null){
+            if (playerInfo.getId() == this.activePlayer.getId()){
+                holder.bg.setBackgroundColor(this.resources.getColor(R.color.playerActive, null));
+            }
+            else {
+                holder.bg.setBackgroundColor(this.resources.getColor(R.color.playerInactive, null));
+            }
         }
-        else {
+        else{
             holder.bg.setBackgroundColor(this.resources.getColor(R.color.playerInactive, null));
         }
+
 
         return row;
     }
