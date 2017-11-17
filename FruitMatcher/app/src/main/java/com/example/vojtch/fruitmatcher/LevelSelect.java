@@ -87,7 +87,7 @@ public class LevelSelect extends Activity {
         List<LevelInfo> levels = db.getLevels();
 
         for (LevelInfo lvl : levels){
-            String lvlName = lvl.getLevelId() + ". Úroveň";
+            String lvlName = "Level " + String.valueOf(lvl.getLevelId());
             levelHeaders.add(lvlName);
             listDetail.put(lvlName, lvl);
         }
@@ -99,7 +99,7 @@ public class LevelSelect extends Activity {
 
     private void startLevel(LevelInfo level){
         if (level.getLevelId() > playerInfo.getMaxLevel() + 1){
-            Toast.makeText(this, "Nepřístupné", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Access denied", Toast.LENGTH_SHORT).show();
             return;
         }
         Intent gameActivity = new Intent(this, CanvasActivity.class);

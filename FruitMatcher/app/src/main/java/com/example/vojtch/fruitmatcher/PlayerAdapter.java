@@ -61,9 +61,9 @@ public class PlayerAdapter extends ArrayAdapter<PlayerInfo> {
         }
 
         PlayerInfo playerInfo = players.get(position);
-        holder.lbName.setText("Hřáč: " + playerInfo.getName());
-        holder.lbMaxLevel.setText("Maximální dosažená úroveň: " + playerInfo.getMaxLevel());
-        holder.lbLastPlayed.setText("Naposledy hráno: " + playerInfo.getPlayed());
+        holder.lbName.setText("Player: " + playerInfo.getName());
+        holder.lbMaxLevel.setText("Maximal level: " + playerInfo.getMaxLevel());
+        holder.lbLastPlayed.setText("Last played: " + playerInfo.getPlayed());
         holder.playerImg.setImageBitmap(playerInfo.getPlayerImg());
 
 

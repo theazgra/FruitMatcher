@@ -1,7 +1,6 @@
 package com.example.vojtch.fruitmatcher.GameEngine;
 
 
-import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -10,7 +9,6 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.support.constraint.ConstraintLayout;
 import android.util.Log;
 
 import com.example.vojtch.fruitmatcher.Database.DatabaseEntity.LevelInfo;
@@ -18,8 +16,6 @@ import com.example.vojtch.fruitmatcher.R;
 
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.concurrent.CompletionService;
-import java.util.logging.Level;
 
 public class Renderer {
 
@@ -203,7 +199,7 @@ public class Renderer {
                     (Constants.QUEST_PANEL_HEIGH/2) + 10.0f, this.textPaint);
         }
 
-        this.questCanvas.drawText("Number of ripening fruit: " + String.valueOf(levelInfo.getTileCount()),
+        this.questCanvas.drawText("Number of ripening fruits: " + String.valueOf(levelInfo.getTileCount()),
                 50, (Constants.QUEST_PANEL_HEIGH - 20.0f), this.textPaint);
     }
 

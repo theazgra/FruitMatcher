@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.vojtch.fruitmatcher.AddPlayer">
+    tools:context="com.example.vojtch.fruitmatcher.AddPlayer"
+    android:background="@android:color/holo_orange_dark">
 
     <LinearLayout
         android:layout_width="341dp"
@@ -16,7 +17,8 @@
         app:layout_constraintHorizontal_bias="0.666"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@android:color/holo_orange_light">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -37,7 +39,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="35dp"
                 android:onClick="onAddImgClick"
-                android:text="Přidat fotku" />
+                android:text="Add photo" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -45,21 +47,21 @@
                 android:orientation="horizontal">
 
                 <Button
-                    android:id="@+id/btnSavePlayer"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:onClick="onSavePlayerClick"
-                    android:text="Vytvořit hráče"
-                    android:textAlignment="center" />
-
-                <Button
                     android:id="@+id/btnCancel"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:onClick="onCancelClick"
-                    android:text="Storno"
+                    android:text="Cancel"
+                    android:textAlignment="center" />
+
+                <Button
+                    android:id="@+id/btnSavePlayer"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:onClick="onSavePlayerClick"
+                    android:text="Create Player"
                     android:textAlignment="center" />
             </LinearLayout>
 

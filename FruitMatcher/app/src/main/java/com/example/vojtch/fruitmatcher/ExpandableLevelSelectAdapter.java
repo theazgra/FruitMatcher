@@ -61,8 +61,8 @@ public class ExpandableLevelSelectAdapter extends BaseExpandableListAdapter {
         TextView orange = (TextView) convertView.findViewById(R.id.lbOrange);
         TextView strawberry = (TextView) convertView.findViewById(R.id.lbStrawberry);
 
-        timeLimit.setText("Časový limit: " + String.valueOf(lvl.getTimeLimit()));
-        tileLimit.setText("Počet políček: " + String.valueOf(lvl.getTileCount()));
+        timeLimit.setText("Time limit: " + String.valueOf(lvl.getTimeLimit()));
+        tileLimit.setText("Tile count: " + String.valueOf(lvl.getTileCount()));
         apple.setText(String.valueOf(lvl.getAppleCount()));
         banana.setText(String.valueOf(lvl.getBananaCount()));
         blueberry.setText(String.valueOf(lvl.getBlueberryCount()));

@@ -121,7 +121,7 @@ public class MainActivity extends Activity {
 
         PlayerInfo player = ((FruitMatcherApp)this.getApplication()).getPlayerInfo();
         if (player != null){
-            lbPlayer.setText("Hráč " + player.getName());
+            lbPlayer.setText("Player " + player.getName());
         }
     }
 
@@ -140,7 +140,7 @@ public class MainActivity extends Activity {
     public void onPlayClick(View v){
         PlayerInfo player = ((FruitMatcherApp)this.getApplication()).getPlayerInfo();
         if (player == null){
-            Toast.makeText(this, "Není zvolen hráč", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "No player is selected", Toast.LENGTH_SHORT).show();
             return;
         }
         Intent levelSelect = new Intent(this, LevelSelect.class);
@@ -149,16 +149,16 @@ public class MainActivity extends Activity {
 
     public void onExitClick(View v){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Opravdu chcete ukončit aplikaci?");
+        builder.setTitle("Do you really want to exit?");
 
-        builder.setPositiveButton("Ano", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 android.os.Process.killProcess(android.os.Process.myPid());
             }
         });
 
-        builder.setNegativeButton("Ne", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
             }
@@ -199,7 +199,7 @@ public class MainActivity extends Activity {
 
             PlayerInfo player = ((FruitMatcherApp)this.getApplication()).getPlayerInfo();
             if (player != null){
-                lbPlayer.setText("Hráč " + player.getName());
+                lbPlayer.setText("Player " + player.getName());
             }
         }
     }

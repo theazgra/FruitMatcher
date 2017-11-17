@@ -41,7 +41,7 @@ public class PlayerSelect extends Activity {
 
                 PlayerInfo player = (PlayerInfo)adapterView.getItemAtPosition(position);
                 ((FruitMatcherApp)getApplication()).setPlayerId(player.getId());
-                Toast.makeText(getApplicationContext(), "Zvolen hráč " + player.getName(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Selected player " + player.getName(), Toast.LENGTH_SHORT).show();
 
                 setResult(RESULT_OK);
                 finish();

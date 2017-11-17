@@ -50,7 +50,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Cíl úrovně"
+                android:text="Level goal"
                 android:textAlignment="center"
                 android:textColor="@android:color/black"
                 android:textStyle="bold" />
