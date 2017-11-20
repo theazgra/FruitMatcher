@@ -25,6 +25,7 @@ public class GameManager {
     private HashMap<Point, Tile> gameTiles;
     private HashMap<Point, Tile> effectTiles;
     private Stack<Tile> selectedTiles;
+    private Stack<Integer> gameTileBuffer;
 
 
     private int bgId;
@@ -64,8 +65,6 @@ public class GameManager {
         this.levelInfo = levelInfo;
         this.context = context;
         this.soundOn = soundOn;
-
-
 
         loadLevel();
     }
@@ -386,12 +385,11 @@ public class GameManager {
         for (int x = 0; x < Constants.GAME_SQUARE_SIZE; x++) {
             Point location = new Point(x * Constants.TILE_SIZE, 0);
             if (getTileAt(location) == null) {
-                Tile newTile = new Tile(location, randomGameTileId(), TileType.GameTile);
+                Tile newTile = new Tile(location, this.gameTileBuffer.pop(), TileType.GameTile);
                 newTile.setDestinationPosition(location);
 
                 addTile(newTile);
 
-                //newTile.setPosition(new Point(location.x, location.y - Constants.TILE_SIZE));
                 --this.levelTileCount;
             }
             if (this.levelTileCount < 1){
@@ -424,7 +422,7 @@ public class GameManager {
                 if (tilesOnGrid.size() > 0){
                     Tile t = tilesOnGrid.pop();
                     Point position = new Point(x * Constants.TILE_SIZE, y * Constants.TILE_SIZE);
-                    addTile(new Tile(position, randomGameTileId(), TileType.GameTile));
+                    addTile(new Tile(position, t.getDrawableId(), TileType.GameTile));
                 }
                 else {
                     return;
@@ -437,7 +435,37 @@ public class GameManager {
 
 
     private void generateGameTileGrid(){
-        gameTiles.clear();
+        this.gameTiles.clear();
+        this.gameTileBuffer = new Stack<Integer>();
+
+
+        for (int i = 0; i < this.levelInfo.getAppleCount(); i++) {
+            this.gameTileBuffer.push(R.drawable.apple);
+        }
+        for (int i = 0; i < this.levelInfo.getBananaCount(); i++) {
+            this.gameTileBuffer.push(R.drawable.banana);
+        }
+        for (int i = 0; i < this.levelInfo.getBlueberryCount(); i++) {
+            this.gameTileBuffer.push(R.drawable.blueberry);
+        }
+        for (int i = 0; i < this.levelInfo.getOrangeCount(); i++) {
+            this.gameTileBuffer.push(R.drawable.orange);
+        }
+        for (int i = 0; i < this.levelInfo.getLemonCount(); i++) {
+            this.gameTileBuffer.push(R.drawable.lemon);
+        }
+        for (int i = 0; i < this.levelInfo.getStrawberryCount (); i++) {
+            this.gameTileBuffer.push(R.drawable.strawberry);
+        }
+
+        int remaining = this.levelTileCount - this.gameTileBuffer.size() + 10;
+        for (int i = 0; i < remaining; i++) {
+            this.gameTileBuffer.push(randomGameTileId());
+        }
+
+        Collections.shuffle(this.gameTileBuffer);
+        Collections.shuffle(this.gameTileBuffer);
+
         int numOfTiles = 0;
 
         if (this.levelTileCount <= 0){
@@ -448,9 +476,8 @@ public class GameManager {
             for (int x = 0; x < Constants.GAME_SQUARE_SIZE; x++) {
 
                 Point position = new Point(x * Constants.TILE_SIZE, y * Constants.TILE_SIZE);
-                addTile(new Tile(position, randomGameTileId(), TileType.GameTile));
+                addTile(new Tile(position, this.gameTileBuffer.pop(), TileType.GameTile));
                 numOfTiles++;
-
             }
             if (numOfTiles > this.levelTileCount){
                 break;
@@ -458,12 +485,6 @@ public class GameManager {
         }
 
         this.levelTileCount -= numOfTiles;
-
-
-        if (!combinationExist()){
-            Toast.makeText(this.context, "no combination", Toast.LENGTH_SHORT).show();
-            //generateGameTileGrid();
-        }
     }
 
     public void addTile(Tile tile) {

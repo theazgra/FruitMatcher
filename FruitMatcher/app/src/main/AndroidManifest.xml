@@ -29,7 +29,8 @@
             android:name=".PlayerSelect"
             android:label="@string/title_activity_players"
             android:screenOrientation="portrait" />
-        <activity android:name=".AddPlayer"></activity>
+        <activity android:name=".AddPlayer" />
+        <activity android:name=".Highscore"></activity>
     </application>
 
 </manifest>

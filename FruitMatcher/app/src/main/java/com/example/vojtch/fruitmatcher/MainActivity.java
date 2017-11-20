@@ -74,6 +74,16 @@ public class MainActivity extends Activity {
             }
         });
 
+        /*
+        ImageView img4 = (ImageView)findViewById(R.id.imgHighscore);
+        img4.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                return onImgMenuItemClick(view, motionEvent);
+            }
+        })
+        */;
+
 
 
         loadPreferences();
@@ -132,6 +142,12 @@ public class MainActivity extends Activity {
         super.onResume();
 
     }
+
+    public void onHighscoreClick(View v){
+        Intent highScore = new Intent(this, Highscore.class);
+        startActivity(highScore);
+    }
+
 
     public void onPlayClick(View v){
         PlayerInfo player = ((FruitMatcherApp)this.getApplication()).getPlayerInfo();

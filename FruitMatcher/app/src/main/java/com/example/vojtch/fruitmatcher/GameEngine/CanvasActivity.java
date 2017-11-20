@@ -14,6 +14,8 @@ import android.widget.Toast;
 import com.example.vojtch.fruitmatcher.Database.DBHandler;
 import com.example.vojtch.fruitmatcher.Database.DatabaseEntity.LevelInfo;
 import com.example.vojtch.fruitmatcher.Database.DatabaseEntity.PlayerInfo;
+import com.example.vojtch.fruitmatcher.Database.DatabaseEntity.PlayerScore;
+import com.example.vojtch.fruitmatcher.Database.DatabaseEntity.Time;
 import com.example.vojtch.fruitmatcher.FruitMatcherApp;
 import com.example.vojtch.fruitmatcher.R;
 import com.example.vojtch.fruitmatcher.SoundFactory;
@@ -23,6 +25,8 @@ public class CanvasActivity extends Activity implements SurfaceHolder.Callback {
     private Renderer renderer;
     private GameManager gameManager;
     private LevelInfo levelInfo;
+    private long gameTime;
+    private long startTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +54,8 @@ public class CanvasActivity extends Activity implements SurfaceHolder.Callback {
 
         this.gameManager = new GameManager(this.levelInfo, this, ((FruitMatcherApp)this.getApplication()).isSoundOn());
         this.gameManager.setActivityUnderHood(this);
+
+        this.startTime = System.currentTimeMillis();
     }
 
 
@@ -59,6 +65,7 @@ public class CanvasActivity extends Activity implements SurfaceHolder.Callback {
         tryDrawing(this.view.getHolder());
 
         if (this.gameManager.isLevelWon()){
+            this.gameTime = System.currentTimeMillis() - this.startTime;
 
             SoundFactory.playSound(this, R.raw.congratulation);
             updatePlayerMaxLvl();
@@ -75,9 +82,23 @@ public class CanvasActivity extends Activity implements SurfaceHolder.Callback {
 
     private void updatePlayerMaxLvl(){
         PlayerInfo playerInfo = ((FruitMatcherApp)this.getApplication()).getPlayerInfo();
-        playerInfo.setMaxLevel(this.levelInfo.getLevelId());
         DBHandler db = new DBHandler(this);
-        db.updatePlayerInfo(playerInfo);
+
+        if (this.levelInfo.getLevelId() > playerInfo.getMaxLevel()){
+            playerInfo.setMaxLevel(this.levelInfo.getLevelId());
+            db.updatePlayerInfo(playerInfo);
+        }
+
+
+        if (db.levelScoreInputExist(playerInfo.getId(), this.levelInfo.getLevelId())) {
+            PlayerScore score = db.getPlayerScore(this.levelInfo.getLevelId(), playerInfo.getId());
+            score.setTime(new Time(this.gameTime));
+            db.updatePlayerScore(score);
+        }
+        else {
+            PlayerScore score = new PlayerScore(playerInfo.getId(), this.levelInfo.getLevelId(), new Time(this.gameTime));
+            db.addPlayerScore(score);
+        }
     }
 
     @Override

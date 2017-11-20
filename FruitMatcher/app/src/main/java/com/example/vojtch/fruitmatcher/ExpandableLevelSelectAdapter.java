@@ -11,8 +11,10 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.vojtch.fruitmatcher.Database.DBHandler;
 import com.example.vojtch.fruitmatcher.Database.DatabaseEntity.LevelInfo;
 import com.example.vojtch.fruitmatcher.Database.DatabaseEntity.PlayerInfo;
+import com.example.vojtch.fruitmatcher.Database.DatabaseEntity.PlayerScore;
 
 import java.util.HashMap;
 import java.util.List;
@@ -52,7 +54,10 @@ public class ExpandableLevelSelectAdapter extends BaseExpandableListAdapter {
             convertView = infalInflater.inflate(R.layout.level_detail, null);
         }
 
-        TextView timeLimit = (TextView) convertView.findViewById(R.id.lbLevelTimeLimit);
+        DBHandler db = new DBHandler(this.context);
+        PlayerScore playerScore = db.getPlayerScore(lvl.getLevelId(), this.playerInfo.getId());
+
+        TextView levelTime = (TextView) convertView.findViewById(R.id.lbLevelTime);
         TextView tileLimit = (TextView) convertView.findViewById(R.id.lbLevelTileLimit);
         TextView apple = (TextView) convertView.findViewById(R.id.lbApple);
         TextView banana = (TextView) convertView.findViewById(R.id.lbBanana);
@@ -61,7 +66,13 @@ public class ExpandableLevelSelectAdapter extends BaseExpandableListAdapter {
         TextView orange = (TextView) convertView.findViewById(R.id.lbOrange);
         TextView strawberry = (TextView) convertView.findViewById(R.id.lbStrawberry);
 
-        timeLimit.setText("Time limit: " + String.valueOf(lvl.getTimeLimit()));
+        if (playerScore != null){
+            levelTime.setText("Level time: " + playerScore.getTime().toString());
+        }
+        else{
+            levelTime.setText("");
+        }
+
         tileLimit.setText("Tile count: " + String.valueOf(lvl.getTileCount()));
         apple.setText(String.valueOf(lvl.getAppleCount()));
         banana.setText(String.valueOf(lvl.getBananaCount()));

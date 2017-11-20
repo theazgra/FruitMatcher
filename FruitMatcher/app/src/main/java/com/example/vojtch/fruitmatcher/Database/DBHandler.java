@@ -11,18 +11,22 @@ import android.widget.Toast;
 
 import com.example.vojtch.fruitmatcher.Database.DatabaseEntity.LevelInfo;
 import com.example.vojtch.fruitmatcher.Database.DatabaseEntity.PlayerInfo;
+import com.example.vojtch.fruitmatcher.Database.DatabaseEntity.PlayerScore;
+import com.example.vojtch.fruitmatcher.Database.DatabaseEntity.Time;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 
 public class DBHandler extends SQLiteOpenHelper {
 
-    private static final int DB_VERSION = 4;
+    private static final int DB_VERSION = 5;
     private static final String DB_NAME = "FRUITY";
     private static final String LEVEL_INFO_TABLE_NAME = "level";
     private static final String PLAYER_INFO_TABLE_NAME = "player";
+    private static final String SCORE_TABLE_NAME = "score";
 
     private static final String KEY_LVL_ID = "levelId";
     private static final String KEY_LVL_LIMIT = "timeLimit";
@@ -39,6 +43,10 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String KEY_PLAYER_MAXLVL = "maxLevel";
     private static final String KEY_PLAYER_PLAYED = "lastPlayed";
     private static final String KEY_PLAYER_IMAGE = "image";
+
+    private static final String KEY_SCORE_PLAYER = "playerId";
+    private static final String KEY_SCORE_LEVEL = "levelId";
+    private static final String KEY_SCORE_TIME = "time";
 
     private Context context;
 
@@ -73,8 +81,17 @@ public class DBHandler extends SQLiteOpenHelper {
                 "FOREIGN KEY(" + KEY_PLAYER_MAXLVL + ") REFERENCES " + LEVEL_INFO_TABLE_NAME + "(" + KEY_LVL_ID + ") " +
                 ");";
 
+        String createScore = "CREATE TABLE " + SCORE_TABLE_NAME + " ( " +
+                KEY_SCORE_PLAYER + " INTEGER NOT NULL, " +
+                KEY_SCORE_LEVEL + " INTEGER NOT NULL, " +
+                KEY_SCORE_TIME + " INTEGER NOT NULL, " +
+                "FOREIGN KEY(" + KEY_SCORE_PLAYER + ") REFERENCES " + PLAYER_INFO_TABLE_NAME + "(" + KEY_PLAYER_ID + ") " +
+                "FOREIGN KEY(" + KEY_SCORE_LEVEL + ") REFERENCES " + LEVEL_INFO_TABLE_NAME + "(" + KEY_LVL_ID + ") " +
+                ");";
+
         db.execSQL(createLevelInfo);
         db.execSQL(createPlayerInfo);
+        db.execSQL(createScore);
 
         Toast.makeText(this.context, "Created DB." , Toast.LENGTH_SHORT).show();
     }
@@ -132,6 +149,36 @@ public class DBHandler extends SQLiteOpenHelper {
         db.close();
     }
 
+    public PlayerScore getPlayerScore(int levelId, int playerId){
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.query(SCORE_TABLE_NAME,
+                new String[]{
+                        KEY_SCORE_PLAYER, KEY_SCORE_LEVEL, KEY_SCORE_TIME
+                },
+                KEY_SCORE_LEVEL + "=? AND " + KEY_SCORE_PLAYER + "=?",
+                new String[]{String.valueOf(levelId), String.valueOf(playerId)},
+                null, null, null, null );
+
+        if (cursor != null && cursor.getCount() > 0){
+            cursor.moveToFirst();
+            int i = -1;
+            PlayerScore playerScore = new PlayerScore(
+                    cursor.getInt(++i),
+                    cursor.getInt(++i),
+                    new Time(cursor.getLong(++i))
+            );
+
+            cursor.close();
+            db.close();
+            return playerScore;
+        }
+        cursor.close();
+        db.close();
+        return null;
+    }
+
+
     public LevelInfo getLevelInfo(int id){
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -169,6 +216,34 @@ public class DBHandler extends SQLiteOpenHelper {
         cursor.close();
         db.close();
         return null;
+    }
+
+    public List<PlayerScore> getAllPlayerScores(int playerId){
+        List<PlayerScore> scores = new ArrayList<PlayerScore>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(SCORE_TABLE_NAME,
+                new String[]{
+                        KEY_SCORE_LEVEL, KEY_SCORE_PLAYER, KEY_SCORE_TIME
+                },
+                KEY_SCORE_PLAYER + "=?",
+                new String[]{String.valueOf(playerId)},
+                null, null, null, null );
+
+        if (cursor.moveToFirst()){
+            do{
+                int i = -1;
+                PlayerScore playerScore = new PlayerScore(
+                        cursor.getInt(++i),
+                        cursor.getInt(++i),
+                        new Time(cursor.getLong(++i))
+                );
+                scores.add(playerScore);
+
+            }while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return scores;
     }
 
 
@@ -230,10 +305,45 @@ public class DBHandler extends SQLiteOpenHelper {
         return rows;
     }
 
+    public int updatePlayerScore(PlayerScore score){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_SCORE_LEVEL, score.getLevelId());
+        values.put(KEY_SCORE_PLAYER, score.getPlayerId());
+        values.put(KEY_SCORE_TIME, score.getTime().toLong());
+        int rows = db.update(
+                SCORE_TABLE_NAME,
+                values,
+                KEY_SCORE_PLAYER + "=? AND " + KEY_SCORE_LEVEL + "=?",
+                new String[]{String.valueOf(score.getPlayerId()), String.valueOf(score.getLevelId())});
+
+        db.close();
+        return rows;
+    }
+
     public void deleteLevelInfo(LevelInfo levelInfo){
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(LEVEL_INFO_TABLE_NAME, KEY_LVL_ID + " = ?",
                 new String[] { String.valueOf(levelInfo.getLevelId()) });
+        db.close();
+    }
+
+    public void delelePlayerScore(PlayerScore score){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(SCORE_TABLE_NAME,
+                KEY_SCORE_PLAYER + "=? AND " + KEY_SCORE_LEVEL + "=?",
+                new String[]{String.valueOf(score.getPlayerId()), String.valueOf(score.getLevelId())});
+        db.close();
+    }
+
+    public void addPlayerScore(PlayerScore playerScore){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_SCORE_LEVEL, playerScore.getLevelId());
+        values.put(KEY_SCORE_PLAYER, playerScore.getPlayerId());
+        values.put(KEY_SCORE_TIME, playerScore.getTime().toLong());
+
+        db.insert(SCORE_TABLE_NAME, null, values);
         db.close();
     }
 
@@ -250,9 +360,27 @@ public class DBHandler extends SQLiteOpenHelper {
     }
 
     private static byte[] getBytes(Bitmap bitmap){
+        if (bitmap == null){
+            return null;
+        }
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 75, stream);
         return  stream.toByteArray();
+    }
+
+    public String getBestPlayerForLevel(int levelId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String q = "SELECT " + KEY_SCORE_PLAYER + " FROM " + SCORE_TABLE_NAME + " WHERE " + KEY_SCORE_LEVEL + " =? ORDER BY " + KEY_SCORE_TIME + " LIMIT 1;";
+        Cursor cursor = db.rawQuery(q, new String[]{String.valueOf(levelId)});
+        if (cursor != null && cursor.getCount() > 0){
+            cursor.moveToFirst();
+            int playerId = cursor.getInt(0);
+            cursor.close();
+            db.close();
+            return getPlayerInfo(playerId).getName();
+        }
+        return "";
     }
 
     public PlayerInfo getPlayerInfo(int id){
@@ -284,7 +412,7 @@ public class DBHandler extends SQLiteOpenHelper {
                     cursor.getString(++i),
                     cursor.getInt(++i),
                     cursor.getString(++i),
-                    BitmapFactory.decodeByteArray(cursor.getBlob(++i), 0, cursor.getBlob(i).length)
+                    cursor.isNull(++i) ? null : BitmapFactory.decodeByteArray(cursor.getBlob(i), 0, cursor.getBlob(i).length)
             );
             cursor.close();
             db.close();
@@ -310,7 +438,7 @@ public class DBHandler extends SQLiteOpenHelper {
                         cursor.getString(++i),
                         cursor.getInt(++i),
                         cursor.getString(++i),
-                        BitmapFactory.decodeByteArray(cursor.getBlob(++i), 0, cursor.getBlob(i).length)
+                        cursor.isNull(++i) ? null : BitmapFactory.decodeByteArray(cursor.getBlob(i), 0, cursor.getBlob(i).length)
                 );
                 players.add(playerInfo);
 
@@ -330,6 +458,28 @@ public class DBHandler extends SQLiteOpenHelper {
         cursor.close();
         db.close();
         return count;
+    }
+
+    public boolean levelScoreInputExist(int playerId, int levelId){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + PLAYER_INFO_TABLE_NAME;
+        Cursor cursor = db.query(
+                SCORE_TABLE_NAME,
+                new String[]{KEY_SCORE_PLAYER, KEY_SCORE_LEVEL, KEY_SCORE_TIME},
+                KEY_SCORE_PLAYER + "=? AND " + KEY_SCORE_LEVEL + "=?",
+                new String[]{String.valueOf(playerId), String.valueOf(levelId)},
+                null, null, null, null );
+
+
+        int count = cursor.getCount();
+        cursor.close();
+        db.close();
+         if (count > 0){
+             return true;
+         }
+         else {
+             return false;
+         }
     }
 
     public int updatePlayerInfo(PlayerInfo playerInfo){
@@ -355,3 +505,4 @@ public class DBHandler extends SQLiteOpenHelper {
         db.close();
     }
 }
+

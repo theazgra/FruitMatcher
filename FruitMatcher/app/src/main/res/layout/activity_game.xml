@@ -33,12 +33,11 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        android:layout_marginTop="81dp"
+        android:layout_marginTop="30dp"
         android:shadowColor="@android:color/background_dark"
         android:shadowDx="5"
         android:shadowDy="5"
         android:shadowRadius="5"
-        android:text="Hráč vojisko83"
         android:textAlignment="center"
         android:textColor="@android:color/background_light"
         android:textSize="24sp"
@@ -59,7 +58,7 @@
         android:layout_marginLeft="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="163dp"
+        android:layout_marginTop="73dp"
         />
 
     <ImageView
@@ -74,7 +73,21 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintHorizontal_bias="0.6"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="287dp" />
+        android:layout_marginTop="188dp" />
+
+    <ImageView
+        android:id="@+id/imgHighscore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:src="@drawable/highscore"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="298dp"
+        android:onClick="onHighscoreClick"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
 
     <ImageView
         android:id="@+id/imgExit"
@@ -87,6 +100,6 @@
         android:layout_marginRight="8dp"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="419dp" />
+        android:layout_marginTop="406dp" />
 
 </android.support.constraint.ConstraintLayout>
